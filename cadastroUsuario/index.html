@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Usuário / Cliente - Oficina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#e06666] min-h-screen flex flex-col font-sans text-slate-900">
+
+    <!-- HEADER -->
+    <header class="bg-[#b34747] text-white px-8 py-4 flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="hover:opacity-80 transition"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+            <h1 class="text-xl font-bold tracking-wide">Cadastro Usuário</h1>
+        </div>
+        <button onclick="openModal()" class="bg-white text-[#b34747] px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-100 transition flex items-center space-x-2">
+            <i class="fa-solid fa-search"></i><span>Consultar Cliente</span>
+        </button>
+    </header>
+
+    <!-- FORMULÁRIO -->
+    <main class="flex-1 max-w-5xl mx-auto w-full p-8 flex items-center justify-center">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full border border-white/20">
+            <form id="usuarioForm" onsubmit="salvarUsuario(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="hidden" id="usuarioId">
+                
+                <!-- Nome -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nome *</label>
+                    <input type="text" id="nome" required placeholder="Nome completo" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Data de Nascimento -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">DataNascimento *</label>
+                    <input type="date" id="dataNascimento" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- CPF / CNPJ -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">CPF/CNPJ *</label>
+                    <input type="text" id="documento" required placeholder="000.000.000-00 ou 00.000.000/0001-00" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Cargo -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Cargo *</label>
+                    <input type="text" id="cargo" required placeholder="Ex: Mecânico, Gerente, Cliente" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Email *</label>
+                    <input type="email" id="email" required placeholder="usuario@email.com" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Senha -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Senha *</label>
+                    <input type="password" id="senha" required placeholder="••••••••" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Telefone -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Telefone *</label>
+                    <input type="text" id="telefone" required placeholder="(44) 99999-9999" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <!-- Nivel de Permissao -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nivel de Permissão *</label>
+                    <select id="nivelPermissao" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                        <option value="">Selecione...</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Operador">Operador / Atendente</option>
+                        <option value="Mecânico">Mecânico</option>
+                        <option value="Cliente">Cliente</option>
+                    </select>
+                </div>
+
+                <!-- BOTÕES -->
+                <div class="md:col-span-2 flex justify-end space-x-4 mt-4">
+                    <button type="reset" onclick="resetForm()" class="bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-300 transition">Limpar</button>
+                    <button type="submit" class="bg-[#e06666] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#b34747] transition shadow-lg">Salvar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- MODAL DE CONSULTA -->
+    <div id="consultaModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-6 bg-[#b34747] text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold">Consulta de Clientes / Usuários</h3>
+                <button onclick="closeModal()" class="text-white hover:opacity-80"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 border-b border-slate-200">
+                <input type="text" id="searchUsuario" onkeyup="filtrarUsuarios()" placeholder="Pesquisar por nome, CPF/CNPJ, email ou cargo..." class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-600 text-sm">
+                            <th class="pb-3">Nome</th>
+                            <th class="pb-3">CPF/CNPJ</th>
+                            <th class="pb-3">Cargo</th>
+                            <th class="pb-3">Permissão</th>
+                            <th class="pb-3 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaUsuarios" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 z-50 font-medium"></div>
+
+    <script>
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+
+        function getUsuarios() { return JSON.parse(localStorage.getItem('oficina_usuarios') || '[]'); }
+        function saveUsuarios(usuarios) { localStorage.setItem('oficina_usuarios', JSON.stringify(usuarios)); }
+
+        function salvarUsuario(e) {
+            e.preventDefault();
+            const id = document.getElementById('usuarioId').value;
+            const doc = document.getElementById('documento').value.trim();
+
+            const novo = {
+                id: id ? id : Date.now().toString(),
+                nome: document.getElementById('nome').value.trim(),
+                dataNascimento: document.getElementById('dataNascimento').value,
+                documento: doc,
+                cargo: document.getElementById('cargo').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                senha: document.getElementById('senha').value,
+                telefone: document.getElementById('telefone').value.trim(),
+                nivelPermissao: document.getElementById('nivelPermissao').value
+            };
+
+            let usuarios = getUsuarios();
+            if (id) {
+                usuarios = usuarios.map(u => u.id === id ? novo : u);
+                showToast('Usuário atualizado com sucesso!');
+            } else {
+                if (usuarios.some(u => u.documento === novo.documento)) {
+                    alert('Já existe um usuário cadastrado com este CPF/CNPJ!');
+                    return;
+                }
+                usuarios.push(novo);
+                showToast('Usuário cadastrado com sucesso!');
+            }
+            saveUsuarios(usuarios);
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('usuarioForm').reset();
+            document.getElementById('usuarioId').value = '';
+        }
+
+        function openModal() {
+            document.getElementById('consultaModal').classList.remove('hidden');
+            renderTabela(getUsuarios());
+        }
+
+        function closeModal() { document.getElementById('consultaModal').classList.add('hidden'); }
+
+        function renderTabela(dados) {
+            const tbody = document.getElementById('tabelaUsuarios');
+            tbody.innerHTML = dados.length === 0 ? '<tr><td colspan="5" class="py-4 text-center text-slate-400">Nenhum usuário cadastrado.</td></tr>' : '';
+            dados.forEach(u => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 font-semibold text-slate-700">${u.nome}</td>
+                        <td class="py-3 text-slate-600">${u.documento}</td>
+                        <td class="py-3 text-slate-600">${u.cargo}</td>
+                        <td class="py-3"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-xs font-semibold">${u.nivelPermissao}</span></td>
+                        <td class="py-3 text-right space-x-2">
+                            <button onclick="editarUsuario('${u.id}')" class="text-blue-600 hover:text-blue-800"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirUsuario('${u.id}')" class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function filtrarUsuarios() {
+            const termo = document.getElementById('searchUsuario').value.toLowerCase();
+            const usuarios = getUsuarios();
+            const filtrados = usuarios.filter(u => u.nome.toLowerCase().includes(termo) || u.documento.toLowerCase().includes(termo) || u.email.toLowerCase().includes(termo) || u.cargo.toLowerCase().includes(termo));
+            renderTabela(filtrados);
+        }
+
+        function editarUsuario(id) {
+            const u = getUsuarios().find(item => item.id === id);
+            if (!u) return;
+            document.getElementById('usuarioId').value = u.id;
+            document.getElementById('nome').value = u.nome;
+            document.getElementById('dataNascimento').value = u.dataNascimento;
+            document.getElementById('documento').value = u.documento;
+            document.getElementById('cargo').value = u.cargo;
+            document.getElementById('email').value = u.email;
+            document.getElementById('senha').value = u.senha;
+            document.getElementById('telefone').value = u.telefone;
+            document.getElementById('nivelPermissao').value = u.nivelPermissao;
+            closeModal();
+            showToast('Usuário carregado para edição.');
+        }
+
+        function excluirUsuario(id) {
+            if (confirm('Deseja realmente excluir este usuário?')) {
+                let usuarios = getUsuarios().filter(u => u.id !== id);
+                saveUsuarios(usuarios);
+                renderTabela(usuarios);
+                showToast('Usuário excluído com sucesso!');
+            }
+        }
+    </script>
+</body>
+</html>
