@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Peça - Oficina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#e06666] min-h-screen flex flex-col font-sans text-slate-900">
+
+    <!-- HEADER -->
+    <header class="bg-[#b34747] text-white px-8 py-4 flex items-center justify-between shadow-md">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="hover:opacity-80 transition"><i class="fa-solid fa-arrow-left text-xl"></i></a>
+            <h1 class="text-xl font-bold tracking-wide">Cadastro Peça</h1>
+        </div>
+        <button onclick="openModal()" class="bg-white text-[#b34747] px-4 py-2 rounded-lg font-semibold shadow hover:bg-slate-100 transition flex items-center space-x-2">
+            <i class="fa-solid fa-search"></i><span>Consultar Peça</span>
+        </button>
+    </header>
+
+    <!-- FORMULÁRIO -->
+    <main class="flex-1 max-w-5xl mx-auto w-full p-8 flex items-center justify-center">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full border border-white/20">
+            <form id="pecaForm" onsubmit="salvarPeca(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="hidden" id="pecaId">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Código Interno *</label>
+                    <input type="text" id="codigoInterno" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Código Original</label>
+                    <input type="text" id="codigoOriginal" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Marca *</label>
+                    <input type="text" id="marca" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Fornecedor</label>
+                    <input type="text" id="fornecedor" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Descrição do Item *</label>
+                    <input type="text" id="descricao" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Aplicação</label>
+                    <input type="text" id="aplicacao" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Unidade de medida *</label>
+                    <select id="unidadeMedida" required class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                        <option value="">Selecione...</option>
+                        <option value="UN">UN (Unidade)</option>
+                        <option value="KG">KG (Quilograma)</option>
+                        <option value="L">L (Litro)</option>
+                        <option value="PAR">Par</option>
+                        <option value="JOGO">Jogo</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Localização *</label>
+                    <input type="text" id="localizacao" required placeholder="Ex: Prateleira A-12" class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+                </div>
+
+                <div class="md:col-span-2 flex justify-end space-x-4 mt-4">
+                    <button type="reset" onclick="resetForm()" class="bg-slate-200 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-300 transition">Limpar</button>
+                    <button type="submit" class="bg-[#e06666] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#b34747] transition shadow-lg">Salvar Peça</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- MODAL DE CONSULTA -->
+    <div id="consultaModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-6 bg-[#b34747] text-white flex justify-between items-center">
+                <h3 class="text-lg font-bold">Consulta de Peças</h3>
+                <button onclick="closeModal()" class="text-white hover:opacity-80"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 border-b border-slate-200">
+                <input type="text" id="searchPeca" onkeyup="filtrarPecas()" placeholder="Pesquisar por código, descrição ou marca..." class="w-full bg-slate-100 border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#e06666]">
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-600 text-sm">
+                            <th class="pb-3">Cód. Interno</th>
+                            <th class="pb-3">Descrição</th>
+                            <th class="pb-3">Marca</th>
+                            <th class="pb-3">Localização</th>
+                            <th class="pb-3 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPecas" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 z-50 font-medium"></div>
+
+    <script>
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+
+        function getPecas() { return JSON.parse(localStorage.getItem('oficina_pecas') || '[]'); }
+        function savePecas(pecas) { localStorage.setItem('oficina_pecas', JSON.stringify(pecas)); }
+
+        function salvarPeca(e) {
+            e.preventDefault();
+            const id = document.getElementById('pecaId').value;
+            const nova = {
+                id: id ? id : Date.now().toString(),
+                codigoInterno: document.getElementById('codigoInterno').value,
+                codigoOriginal: document.getElementById('codigoOriginal').value,
+                marca: document.getElementById('marca').value,
+                fornecedor: document.getElementById('fornecedor').value,
+                descricao: document.getElementById('descricao').value,
+                aplicacao: document.getElementById('aplicacao').value,
+                unidadeMedida: document.getElementById('unidadeMedida').value,
+                localizacao: document.getElementById('localizacao').value
+            };
+
+            let pecas = getPecas();
+            if (id) {
+                pecas = pecas.map(p => p.id === id ? nova : p);
+                showToast('Peça atualizada com sucesso!');
+            } else {
+                if (pecas.some(p => p.codigoInterno === nova.codigoInterno)) {
+                    alert('Já existe uma peça cadastrada com este Código Interno!');
+                    return;
+                }
+                pecas.push(nova);
+                showToast('Peça cadastrada com sucesso!');
+            }
+            savePecas(pecas);
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('pecaForm').reset();
+            document.getElementById('pecaId').value = '';
+        }
+
+        function openModal() {
+            document.getElementById('consultaModal').classList.remove('hidden');
+            renderTabela(getPecas());
+        }
+
+        function closeModal() { document.getElementById('consultaModal').classList.add('hidden'); }
+
+        function renderTabela(dados) {
+            const tbody = document.getElementById('tabelaPecas');
+            tbody.innerHTML = dados.length === 0 ? '<tr><td colspan="5" class="py-4 text-center text-slate-400">Nenhuma peça cadastrada.</td></tr>' : '';
+            dados.forEach(p => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3 font-semibold text-slate-700">${p.codigoInterno}</td>
+                        <td class="py-3 text-slate-600">${p.descricao}</td>
+                        <td class="py-3 text-slate-600">${p.marca}</td>
+                        <td class="py-3"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md text-xs font-semibold">${p.localizacao}</span></td>
+                        <td class="py-3 text-right space-x-2">
+                            <button onclick="editarPeca('${p.id}')" class="text-blue-600 hover:text-blue-800"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="excluirPeca('${p.id}')" class="text-red-600 hover:text-red-800"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function filtrarPecas() {
+            const termo = document.getElementById('searchPeca').value.toLowerCase();
+            const pecas = getPecas();
+            const filtradas = pecas.filter(p => p.codigoInterno.toLowerCase().includes(termo) || p.descricao.toLowerCase().includes(termo) || p.marca.toLowerCase().includes(termo));
+            renderTabela(filtradas);
+        }
+
+        function editarPeca(id) {
+            const p = getPecas().find(item => item.id === id);
+            if (!p) return;
+            document.getElementById('pecaId').value = p.id;
+            document.getElementById('codigoInterno').value = p.codigoInterno;
+            document.getElementById('codigoOriginal').value = p.codigoOriginal;
+            document.getElementById('marca').value = p.marca;
+            document.getElementById('fornecedor').value = p.fornecedor;
+            document.getElementById('descricao').value = p.descricao;
+            document.getElementById('aplicacao').value = p.aplicacao;
+            document.getElementById('unidadeMedida').value = p.unidadeMedida;
+            document.getElementById('localizacao').value = p.localizacao;
+            closeModal();
+            showToast('Peça carregada para edição.');
+        }
+
+        function excluirPeca(id) {
+            if (confirm('Deseja realmente excluir esta peça?')) {
+                let pecas = getPecas().filter(p => p.id !== id);
+                savePecas(pecas);
+                renderTabela(pecas);
+                showToast('Peça excluída com sucesso!');
+            }
+        }
+    </script>
+</body>
+</html>
