@@ -6,9 +6,7 @@
     <title>Cadastro Usuário - MOTORPOINT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #0B132B; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col font-sans">
 
@@ -16,8 +14,8 @@
     <header class="bg-[#1C2541] border-b border-slate-800/80 px-8 py-4 flex items-center justify-between shadow-lg">
         <div class="flex items-center space-x-4">
             <a href="../../menuPrincipal/index.html" class="text-slate-300 hover:text-white transition flex items-center space-x-2">
-    <i class="fa-solid fa-arrow-left text-lg"></i>
-</a>
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </a>
             <h1 class="text-xl font-bold tracking-wide text-slate-100">Cadastro Usuário</h1>
         </div>
         <button onclick="openModal()" class="bg-[#E06666] hover:bg-[#c95252] text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center space-x-2">
@@ -94,7 +92,7 @@
         </div>
     </main>
 
-    <!-- MODAL DE CONSULTA (DARK TONE) -->
+    <!-- MODAL DE CONSULTA -->
     <div id="consultaModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
         <div class="bg-[#1C2541] border border-slate-800 rounded-3xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-6 border-b border-slate-800 flex justify-between items-center">
@@ -102,16 +100,16 @@
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-6 border-b border-slate-800/60 bg-[#0B132B]/50">
-                <input type="text" id="searchUsuario" onkeyup="filtrarUsuarios()" placeholder="Pesquisar por nome, CPF/CNPJ, email ou cargo..." class="w-full bg-[#0B132B] border border-slate-700 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666]">
+                <input type="text" id="searchUsuario" onkeyup="filtrarUsuarios()" placeholder="Pesquisar por nome, email ou CPF/CNPJ..." class="w-full bg-[#0B132B] border border-slate-700 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666]">
             </div>
             <div class="flex-1 overflow-y-auto p-6">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 text-sm">
                             <th class="pb-3">Nome</th>
-                            <th class="pb-3">CPF/CNPJ</th>
+                            <th class="pb-3">Email</th>
+                            <th class="pb-3">Telefone</th>
                             <th class="pb-3">Cargo</th>
-                            <th class="pb-3">Permissão</th>
                             <th class="pb-3 text-right">Ações</th>
                         </tr>
                     </thead>
@@ -124,111 +122,6 @@
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3.5 rounded-xl shadow-2xl transition-all duration-300 z-50 font-medium"></div>
 
-    <script>
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden');
-            setTimeout(() => t.classList.add('hidden'), 3000);
-        }
-
-        function getUsuarios() { return JSON.parse(localStorage.getItem('oficina_usuarios') || '[]'); }
-        function saveUsuarios(usuarios) { localStorage.setItem('oficina_usuarios', JSON.stringify(usuarios)); }
-
-        function salvarUsuario(e) {
-            e.preventDefault();
-            const id = document.getElementById('usuarioId').value;
-            const doc = document.getElementById('documento').value.trim();
-
-            const novo = {
-                id: id ? id : Date.now().toString(),
-                nome: document.getElementById('nome').value.trim(),
-                dataNascimento: document.getElementById('dataNascimento').value,
-                documento: doc,
-                cargo: document.getElementById('cargo').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                senha: document.getElementById('senha').value,
-                telefone: document.getElementById('telefone').value.trim(),
-                nivelPermissao: document.getElementById('nivelPermissao').value
-            };
-
-            let usuarios = getUsuarios();
-            if (id) {
-                usuarios = usuarios.map(u => u.id === id ? novo : u);
-                showToast('Usuário atualizado com sucesso!');
-            } else {
-                if (usuarios.some(u => u.documento === novo.documento)) {
-                    alert('Já existe um usuário cadastrado com este CPF/CNPJ!');
-                    return;
-                }
-                usuarios.push(novo);
-                showToast('Usuário cadastrado com sucesso!');
-            }
-            saveUsuarios(usuarios);
-            resetForm();
-        }
-
-        function resetForm() {
-            document.getElementById('usuarioForm').reset();
-            document.getElementById('usuarioId').value = '';
-        }
-
-        function openModal() {
-            document.getElementById('consultaModal').classList.remove('hidden');
-            renderTabela(getUsuarios());
-        }
-
-        function closeModal() { document.getElementById('consultaModal').classList.add('hidden'); }
-
-        function renderTabela(dados) {
-            const tbody = document.getElementById('tabelaUsuarios');
-            tbody.innerHTML = dados.length === 0 ? '<tr><td colspan="5" class="py-6 text-center text-slate-500">Nenhum usuário cadastrado.</td></tr>' : '';
-            dados.forEach(u => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-800/40 transition">
-                        <td class="py-3.5 font-medium text-slate-100">${u.nome}</td>
-                        <td class="py-3.5 text-slate-400">${u.documento}</td>
-                        <td class="py-3.5 text-slate-400">${u.cargo}</td>
-                        <td class="py-3.5"><span class="bg-[#E06666]/10 text-[#E06666] px-2.5 py-1 rounded-md text-xs font-medium">${u.nivelPermissao}</span></td>
-                        <td class="py-3.5 text-right space-x-3">
-                            <button onclick="editarUsuario('${u.id}')" class="text-blue-400 hover:text-blue-300 transition"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="excluirUsuario('${u.id}')" class="text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        function filtrarUsuarios() {
-            const termo = document.getElementById('searchUsuario').value.toLowerCase();
-            const usuarios = getUsuarios();
-            const filtrados = usuarios.filter(u => u.nome.toLowerCase().includes(termo) || u.documento.toLowerCase().includes(termo) || u.email.toLowerCase().includes(termo) || u.cargo.toLowerCase().includes(termo));
-            renderTabela(filtrados);
-        }
-
-        function editarUsuario(id) {
-            const u = getUsuarios().find(item => item.id === id);
-            if (!u) return;
-            document.getElementById('usuarioId').value = u.id;
-            document.getElementById('nome').value = u.nome;
-            document.getElementById('dataNascimento').value = u.dataNascimento;
-            document.getElementById('documento').value = u.documento;
-            document.getElementById('cargo').value = u.cargo;
-            document.getElementById('email').value = u.email;
-            document.getElementById('senha').value = u.senha;
-            document.getElementById('telefone').value = u.telefone;
-            document.getElementById('nivelPermissao').value = u.nivelPermissao;
-            closeModal();
-            showToast('Usuário carregado para edição.');
-        }
-
-        function excluirUsuario(id) {
-            if (confirm('Deseja realmente excluir este usuário?')) {
-                let usuarios = getUsuarios().filter(u => u.id !== id);
-                saveUsuarios(usuarios);
-                renderTabela(usuarios);
-                showToast('Usuário excluído com sucesso!');
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
