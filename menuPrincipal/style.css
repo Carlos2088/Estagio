@@ -1,0 +1,25 @@
+/* Customizações globais adicionais e ajustes de scrollbar */
+
+/* Scrollbar personalizada para o tema escuro */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617; /* Slate 950 */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b; /* Slate 800 */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e06666; /* Tom coral de destaque */
+}
+
+/* Transições suaves para rotações dos ícones do menu */
+.rotate-180 {
+    transform: rotate(180deg);
+}
