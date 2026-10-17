@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Peças - MOTORPOINT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> body { background-color: #0B132B; } </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- HEADER -->
+    <header class="bg-[#1C2541] border-b border-slate-800/80 px-8 py-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-4">
+            <a href="../../menuPrincipal/index.html" class="text-slate-300 hover:text-white transition flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </a>
+            <h1 class="text-xl font-bold tracking-wide text-slate-100">Consulta de Peças & Estoque</h1>
+        </div>
+        <a href="../cadastroPeca/cadastroPeca.html" class="bg-[#E06666] hover:bg-[#c95252] text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center space-x-2">
+            <i class="fa-solid fa-boxes-stacked"></i><span>Cadastrar Peça</span>
+        </a>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main class="flex-1 max-w-7xl mx-auto w-full p-6 md:p-10 space-y-6">
+        
+        <!-- PAINEL DE FILTROS -->
+        <div class="bg-[#1C2541] border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-slate-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-filter text-[#E06666]"></i><span>Filtros de Pesquisa</span>
+                </h3>
+                <button onclick="gerarRelatorio()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold text-sm transition flex items-center space-x-2 shadow-md">
+                    <i class="fa-solid fa-file-pdf"></i><span>Gerar Relatório</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Buscar por Nome / Código / Descrição</label>
+                    <input type="text" id="filtroTexto" onkeyup="aplicarFiltros()" placeholder="Digite para filtrar..." class="w-full bg-[#0B132B] border border-slate-700 rounded-xl p-2.5 text-sm text-slate-100 focus:outline-none focus:border-[#E06666]">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Status de Estoque</label>
+                    <select id="filtroStatus" onchange="aplicarFiltros()" class="w-full bg-[#0B132B] border border-slate-700 rounded-xl p-2.5 text-sm text-slate-100 focus:outline-none focus:border-[#E06666]">
+                        <option value="">Todos os status</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Estoque Baixo">Estoque Baixo</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="limparFiltros()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl p-2.5 text-sm font-medium transition">Limpar Filtros</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA -->
+        <div class="bg-[#1C2541] border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-[#0B132B]/80 border-b border-slate-800 text-slate-400 text-xs uppercase tracking-wider">
+                            <th class="p-4">NOME / CÓDIGO</th>
+                            <th class="p-4">DESCRIÇÃO</th>
+                            <th class="p-4 text-center">QUANTIDADE</th>
+                            <th class="p-4 text-right">PREÇO (R$)</th>
+                            <th class="p-4 text-center">STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaPecas" class="divide-y divide-slate-800/60 text-sm text-slate-200">
+                        <!-- Preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function getDados() {
+            const pecas = JSON.parse(localStorage.getItem('oficina_pecas') || '[]');
+            return pecas.map(p => ({
+                nome: p.codigoInterno,
+                descricao: p.descricao,
+                quantidade: 15, // Valor simulado ou padrão
+                preco: 120.00,  // Valor simulado ou padrão
+                status: 'Normal'
+            }));
+        }
+
+        let dadosAtuais = getDados();
+
+        function renderTabela(lista) {
+            const tbody = document.getElementById('tabelaPecas');
+            tbody.innerHTML = lista.length === 0 ? '<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhuma peça encontrada.</td></tr>' : '';
+            
+            lista.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40 transition">
+                        <td class="p-4 font-mono font-bold text-[#E06666]">${item.nome}</td>
+                        <td class="p-4 text-slate-300">${item.descricao}</td>
+                        <td class="p-4 text-center font-semibold text-slate-100">${item.quantidade}</td>
+                        <td class="p-4 text-right text-emerald-400 font-medium">R$ ${item.preco.toFixed(2)}</td>
+                        <td class="p-4 text-center"><span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-medium">${item.status}</span></td>
+                    </tr>`;
+            });
+        }
+
+        function aplicarFiltros() {
+            const texto = document.getElementById('filtroTexto').value.toLowerCase();
+            const status = document.getElementById('filtroStatus').value;
+            
+            const todos = getDados();
+            dadosAtuais = todos.filter(item => {
+                const matchTexto = item.nome.toLowerCase().includes(texto) || item.descricao.toLowerCase().includes(texto);
+                const matchStatus = status === '' || item.status === status;
+                return matchTexto && matchStatus;
+            });
+            renderTabela(dadosAtuais);
+        }
+
+        function limparFiltros() {
+            document.getElementById('filtroTexto').value = '';
+            document.getElementById('filtroStatus').value = '';
+            dadosAtuais = getDados();
+            renderTabela(dadosAtuais);
+        }
+
+        function gerarRelatorio() {
+            const janela = window.open('', '_blank');
+            janela.document.write(`
+                <html><head><title>Relatório de Peças</title>
+                <style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #ddd;padding:10px;text-align:left;}th{background:#E06666;color:white;}</style>
+                </head><body>
+                <h2>Relatório de Peças e Estoque - MOTORPOINT</h2>
+                <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+                <table><thead><tr><th>NOME / CÓDIGO</th><th>DESCRIÇÃO</th><th>QUANTIDADE</th><th>PREÇO (R$)</th><th>STATUS</th></tr></thead><tbody>
+                ${dadosAtuais.map(i => `<tr><td>${i.nome}</td><td>${i.descricao}</td><td>${i.quantidade}</td><td>R$ ${i.preco.toFixed(2)}</td><td>${i.status}</td></tr>`).join('')}
+                </tbody></table></body></html>
+            `);
+            janela.document.close();
+            janela.print();
+        }
+
+        renderTabela(dadosAtuais);
+    </script>
+</body>
+</html>
