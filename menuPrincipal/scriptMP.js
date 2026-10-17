@@ -1,5 +1,10 @@
-/* ================= Configurações ================= */
-const LOGIN_URL = '../login/login.html'; // ajuste para o caminho da sua tela de login
+const LOGIN_URL = '../telaLogin/telaLogin.html';
+const SESSAO_KEY = 'motorpoint_user_session';
+
+// Protege a página: sem sessão, volta para o login
+//if (!localStorage.getItem(SESSAO_KEY)) {
+    //window.location.replace(LOGIN_URL);
+//}
 
 const CORES = {
     amarelo: { hex: '#eab308', texto: '#1e293b', nome: 'Atenção' },
@@ -87,8 +92,8 @@ function destacarLinkAtual() {
 
 function sairDoSistema() {
     if (!confirm('Deseja sair do sistema?')) return;
-    localStorage.removeItem('oficina_sessao');
-    window.location.href = LOGIN_URL;
+    localStorage.removeItem(SESSAO_KEY);
+    window.location.replace(LOGIN_URL);
 }
 
 /* ================= Calendário ================= */
