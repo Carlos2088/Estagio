@@ -1,4 +1,4 @@
-const LOGIN_URL = '../telaLogin/telaLogin.html';
+const LOGIN_URL = '../telaLogin/index.html';
 const SESSAO_KEY = 'motorpoint_user_session';
 
 // Protege a página: sem sessão, volta para o login
