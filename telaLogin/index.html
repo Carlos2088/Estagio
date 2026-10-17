@@ -135,7 +135,6 @@
                 if (lembrar) localStorage.setItem('motorpoint_remembered_user', usuario);
                 else localStorage.removeItem('motorpoint_remembered_user');
                 localStorage.setItem(SESSAO_KEY, JSON.stringify({ usuario, loginTime: new Date().toISOString() }));
-                alert('Indo para: ' + new URL(MENU_URL, location.href).href);
                     window.location.href = MENU_URL;
             } else {
                 document.getElementById('errorMessage').innerText = 'Usuário ou senha incorretos. Tente admin / 123456';
