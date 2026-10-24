@@ -125,19 +125,38 @@ function adicionarItem(id) {
 }
 function mudarQtd(i, v) { itens[i].qtd = Math.max(1, parseInt(v) || 1); renderItens(); }
 function removerItem(i) { itens.splice(i, 1); renderItens(); }
+const STATUS_COR = {'Em Análise':'#38bdf8','Pendente':'#f59e0b','Aprovado':'#10b981','Faturado':'#a78bfa','Cancelado':'#ef4444','Concluída':'#10b981','Cancelada':'#ef4444'};
+function vazio(icone, msg) { return `<div class="vazio"><i class="fa-solid ${icone}"></i>${msg}</div>`; }
+function cardResumo(icone, cor, rotulo, valor, clique) {
+  const tag = clique ? 'button type="button" onclick="' + clique + '"' : 'div';
+  return `<${tag} class="card-resumo text-left"><span class="ico" style="background:${cor}26;color:${cor}"><i class="fa-solid ${icone}"></i></span>
+    <span><span class="block text-xs text-slate-400">${rotulo}</span><span class="block text-lg font-bold text-slate-100">${valor}</span></span></${clique ? 'button' : 'div'}>`;
+}
+function atualizarContadores() { $('cntPedidos').innerText = pedidos.length; $('cntVendas').innerText = vendas.length; }
+
 function renderItens() {
   const pecas = ler('oficina_pecas', []);
   $('listaItens').innerHTML = itens.length ? itens.map((it, i) => {
-    const pc = pecas.find(x => pid(x) === it.pecaId), disp = pc ? num(pick(pc,'qtd')) : 0;
-    return `<div class="flex items-center gap-2 p-3 rounded-xl bg-[#0B132B] border border-slate-800">
-      <div class="min-w-0 flex-1"><p class="text-sm font-medium truncate">${esc(it.descricao)}</p>
-        <p class="text-xs ${it.qtd > disp ? 'text-amber-400' : 'text-slate-500'}">${esc(it.codigo)} · Estoque: ${disp}${it.qtd > disp ? ' (acima do estoque)' : ''}</p></div>
-      <input type="number" min="1" value="${it.qtd}" onchange="mudarQtd(${i}, this.value)" class="inp !w-16 !p-2 text-center">
-      <button type="button" onclick="removerItem(${i})" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+    const pc = pecas.find(x => pid(x) === it.pecaId), disp = pc ? num(pick(pc, 'qtd')) : 0;
+    const falta = it.qtd > disp, sub = num(it.preco) * it.qtd;
+    return `<div class="item-linha ${falta ? 'item-alerta' : ''}">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold truncate">${esc(it.descricao)}</p>
+        <p class="text-xs text-slate-500 truncate">${esc(it.codigo)}${it.marca ? ' · ' + esc(it.marca) : ''}</p>
+        <p class="text-xs ${falta ? 'text-amber-400' : 'text-emerald-400'}"><i class="fa-solid ${falta ? 'fa-triangle-exclamation' : 'fa-circle-check'} mr-1"></i>${falta ? 'Acima do estoque' : 'Em estoque'}: ${disp}</p>
+      </div>
+      <div class="flex flex-col items-end gap-1.5">
+        <div class="stepper"><button type="button" onclick="mudarQtd(${i}, ${it.qtd - 1})">−</button>
+          <input type="number" min="1" value="${it.qtd}" onchange="mudarQtd(${i}, this.value)"><button type="button" onclick="mudarQtd(${i}, ${it.qtd + 1})">+</button></div>
+        <span class="text-xs text-slate-400">${num(it.preco) > 0 ? money(num(it.preco)) + ' un · <b class="text-slate-100">' + money(sub) + '</b>' : 'sem preço'}</span>
+      </div>
+      <button type="button" onclick="removerItem(${i})" class="text-slate-500 hover:text-red-400" title="Remover"><i class="fa-solid fa-trash"></i></button>
     </div>`;
-  }).join('') : '<p class="text-sm text-slate-500 text-center py-6">Nenhum item adicionado.</p>';
-  const t = totalDe(itens);
-  $('totalForm').innerText = t > 0 ? money(t) : '-';
+  }).join('') : vazio('fa-cart-plus', 'Pesquise uma peça acima para adicionar ao pedido.');
+  const t = totalDe(itens), un = itens.reduce((s, i) => s + i.qtd, 0);
+  $('resumoForm').innerHTML = `<div class="flex items-end justify-between gap-3">
+    <div><p class="text-xs text-slate-400">${itens.length} item(ns) · ${un} unidade(s)</p><p class="text-xs text-slate-400 mt-1">Total do pedido</p></div>
+    <p class="text-2xl font-bold text-slate-100">${t > 0 ? money(t) : '-'}</p></div>`;
 }
 
 function salvarPedido() {
@@ -172,27 +191,41 @@ function acoesPedido(p) {
   if (p.status === 'Aprovado') return ven + pen + can;
   return '';
 }
+function filtrarStatus(s) { $('filtroStatus').value = s; renderPedidos(); }
+function progresso(p) {
+  if (p.status === 'Cancelado') return '<span class="text-xs text-red-400"><i class="fa-solid fa-ban mr-1"></i>Pedido cancelado</span>';
+  const fluxo = ['Em Análise', 'Aprovado', 'Faturado'];
+  const atual = p.status === 'Pendente' ? 0 : fluxo.indexOf(p.status);
+  return '<div class="passos">' + fluxo.map((f, i) =>
+    `<span class="passo ${i <= atual ? 'on' : ''} ${p.status === 'Pendente' && i === 0 ? 'pend' : ''}"><i></i>${p.status === 'Pendente' && i === 0 ? 'Pendente' : f}</span>`
+  ).join('<span class="passo-linha"></span>') + '</div>';
+}
 function renderPedidos() {
-  const f = $('filtroStatus').value;
+  const f = $('filtroStatus').value, cont = st => pedidos.filter(p => p.status === st).length;
+  $('resumoPedidos').innerHTML = cardResumo('fa-list', '#94a3b8', 'Todos', pedidos.length, "filtrarStatus('')") +
+    [['Em Análise', 'fa-hourglass-half'], ['Pendente', 'fa-pause'], ['Aprovado', 'fa-circle-check'], ['Faturado', 'fa-receipt']]
+      .map(([s, ic]) => cardResumo(ic, STATUS_COR[s], s, cont(s), `filtrarStatus('${s}')`)).join('');
   const lista = pedidos.filter(p => !f || p.status === f).sort((a, b) => b.numero - a.numero);
   $('listaPedidos').innerHTML = lista.length ? lista.map(p => {
     const t = totalDe(p.itens), qt = p.itens.reduce((s, i) => s + i.qtd, 0);
-    return `<div class="bg-[#1C2541] border border-slate-800 rounded-2xl p-5 space-y-3">
+    return `<div class="pedido-card space-y-3" style="border-left-color:${STATUS_COR[p.status]}">
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <div><span class="font-bold">Pedido #${fmtNum(p.numero)}</span><span class="text-xs text-slate-400 ml-2">${fmtData(p.data)}</span></div>
         <span class="text-xs px-3 py-1 rounded-full ${STATUS_PED[p.status]}">${esc(p.status)}</span>
       </div>
+      ${progresso(p)}
       <div class="text-sm text-slate-300 grid sm:grid-cols-2 gap-1">
-        <p><span class="text-slate-500">Cliente:</span> ${esc(p.cliente.nome)} ${p.cliente.documento ? '· ' + esc(p.cliente.documento) : ''}</p>
-        <p><span class="text-slate-500">Vendedor:</span> ${esc(p.vendedor.nome)}${p.vendedor.cargo ? ' (' + esc(p.vendedor.cargo) + ')' : ''}</p>
+        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(p.cliente.nome)} ${p.cliente.documento ? '· ' + esc(p.cliente.documento) : ''}</p>
+        <p><i class="fa-solid fa-id-badge text-slate-500 mr-2"></i>${esc(p.vendedor.nome)}${p.vendedor.cargo ? ' (' + esc(p.vendedor.cargo) + ')' : ''}</p>
       </div>
       <p class="text-xs text-slate-400">${p.itens.map(i => esc(i.descricao) + ' x' + i.qtd).join(' · ')}</p>
-      <div class="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-slate-800">
-        <span class="text-sm text-slate-400">${qt} un.${t > 0 ? ' · <b class="text-slate-100">' + money(t) + '</b>' : ''}</span>
+      <div class="flex items-center justify-between gap-3 flex-wrap pt-3 border-t border-slate-800">
+        <span class="text-sm text-slate-400">${qt} un.${t > 0 ? ' · <b class="text-lg text-slate-100">' + money(t) + '</b>' : ''}</span>
         <div class="flex gap-2 flex-wrap">${acoesPedido(p)}</div>
       </div>
     </div>`;
-  }).join('') : '<p class="text-center text-slate-500 py-10">Nenhum pedido encontrado.</p>';
+  }).join('') : vazio('fa-clipboard-list', 'Nenhum pedido encontrado.');
+  atualizarContadores();
 }
 
 function acaoPedido(id, acao) {
@@ -263,22 +296,27 @@ function realizarVenda(id) {
 /* ===== Lista de vendas e cancelamento ===== */
 function renderVendas() {
   const lista = vendas.slice().sort((a, b) => b.numero - a.numero);
+  const ok = vendas.filter(v => v.status === 'Concluída'), total = ok.reduce((s, v) => s + v.total, 0);
+  $('resumoVendas').innerHTML = cardResumo('fa-circle-check', '#10b981', 'Vendas concluídas', ok.length) +
+    cardResumo('fa-sack-dollar', '#E06666', 'Total vendido', total > 0 ? money(total) : '-') +
+    cardResumo('fa-ban', '#ef4444', 'Canceladas', vendas.length - ok.length);
   $('listaVendas').innerHTML = lista.length ? lista.map(v => `
-    <div class="bg-[#1C2541] border border-slate-800 rounded-2xl p-5 space-y-3">
+    <div class="pedido-card space-y-3" style="border-left-color:${STATUS_COR[v.status]}">
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <div><span class="font-bold">Venda #${fmtNum(v.numero)}</span><span class="text-xs text-slate-400 ml-2">${fmtData(v.data)} · Pedido #${fmtNum(v.pedidoNumero)}</span></div>
         <span class="text-xs px-3 py-1 rounded-full ${STATUS_VEN[v.status]}">${esc(v.status)}</span>
       </div>
       <div class="text-sm text-slate-300 grid sm:grid-cols-2 gap-1">
-        <p><span class="text-slate-500">Cliente:</span> ${esc(v.cliente.nome)}</p>
-        <p><span class="text-slate-500">Vendedor:</span> ${esc(v.vendedor.nome)}</p>
+        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(v.cliente.nome)}</p>
+        <p><i class="fa-solid fa-id-badge text-slate-500 mr-2"></i>${esc(v.vendedor.nome)}</p>
       </div>
       <p class="text-xs text-slate-400">${v.itens.map(i => esc(i.descricao) + ' x' + i.qtd).join(' · ')}</p>
-      <div class="flex items-center justify-between gap-3 flex-wrap pt-2 border-t border-slate-800">
-        <span class="text-sm text-slate-400">${v.itens.reduce((s, i) => s + i.qtd, 0)} un.${v.total > 0 ? ' · <b class="text-slate-100">' + money(v.total) + '</b>' : ''}</span>
+      <div class="flex items-center justify-between gap-3 flex-wrap pt-3 border-t border-slate-800">
+        <span class="text-sm text-slate-400">${v.itens.reduce((s, i) => s + i.qtd, 0)} un.${v.total > 0 ? ' · <b class="text-lg text-slate-100">' + money(v.total) + '</b>' : ''}</span>
         ${v.status === 'Concluída' ? `<button type="button" onclick="pedirCancelarVenda('${v.id}')" class="bt bg-red-500/20 hover:bg-red-500/30 text-red-300"><i class="fa-solid fa-ban mr-1"></i>Cancelar venda</button>` : ''}
       </div>
-    </div>`).join('') : '<p class="text-center text-slate-500 py-10">Nenhuma venda registrada.</p>';
+    </div>`).join('') : vazio('fa-receipt', 'Nenhuma venda registrada.');
+  atualizarContadores();
 }
 function pedirCancelarVenda(id) {
   const v = vendas.find(x => x.id === id); if (!v) return;
@@ -302,7 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (ler('oficina_sidebar_oculta', false) && window.innerWidth >= 1024) { $('sidebar').classList.add('collapsed'); $('setaSidebar').className = 'fa-solid fa-angles-right'; }
   aplicarMascara('cDoc', 'documento'); aplicarMascara('cNumero', 'telefone');
   ligarValidacaoCampos(CAMPOS_CLIENTE);
+  $('busca').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const b = document.querySelector('#resultados button'); if (b) b.click(); } });
+  atualizarContadores();
   preencherVendedor(); renderItens();
   const h = location.hash.slice(1);
   mostrarAba(ABAS.includes(h) ? h : 'novo');
-}); 
+});
