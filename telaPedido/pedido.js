@@ -73,6 +73,12 @@ window.addEventListener('hashchange', () => {
 });
 
 /* ===== Formulário do pedido ===== */
+// CPF/CNPJ e número são opcionais no pedido, mas, se preenchidos, precisam ser válidos
+const CAMPOS_CLIENTE = [
+  ['cDoc', v => v ? validarDocumento(v) : { ok: true, msg: '' }],
+  ['cNumero', v => v ? validarTelefone(v) : { ok: true, msg: '' }]
+];
+
 function preencherVendedor() {
   const sessao = ler(SESSAO_KEY, null);
   const login = sessao && sessao.usuario ? String(sessao.usuario) : '';
@@ -84,12 +90,12 @@ function preencherVendedor() {
 function preencherCliente() {
   const nome = $('cNome').value.trim().toLowerCase();
   const u = ler('oficina_usuarios', []).find(x => (x.nome || '').toLowerCase() === nome);
-  if (u) { if (!$('cNumero').value) $('cNumero').value = u.telefone || ''; if (!$('cDoc').value) $('cDoc').value = u.documento || ''; }
+  if (u) { if (!$('cNumero').value) $('cNumero').value = mascaraTelefone(u.telefone); if (!$('cDoc').value) $('cDoc').value = mascaraDocumento(u.documento); }
 }
 function limparForm() {
   editId = null; itens = [];
   ['cNome','cNumero','cDoc','busca'].forEach(i => $(i).value = '');
-  $('bannerEdit').classList.add('hidden'); $('formErro').classList.add('hidden');
+  $('bannerEdit').classList.add('hidden'); $('formErro').classList.add('hidden'); limparErrosCampos($('aba-novo'));
   $('tabNovoTxt').innerText = 'Novo Pedido'; $('btnSalvar').innerText = 'Salvar';
   preencherVendedor(); renderItens();
 }
@@ -138,8 +144,7 @@ function salvarPedido() {
   const v = {nome:$('vNome').value.trim(), cargo:$('vCargo').value.trim()};
   const c = {nome:$('cNome').value.trim(), numero:$('cNumero').value.trim(), documento:$('cDoc').value.trim()};
   if (!v.nome || !c.nome) return erroForm('Informe o nome do vendedor e do cliente.');
-  if (c.documento) { const r = validarDocumento(c.documento); if (!r.ok) return erroForm('CPF/CNPJ do cliente: ' + r.msg); }
-  if (c.numero) { const r = validarTelefone(c.numero); if (!r.ok) return erroForm('Telefone do cliente: ' + r.msg); }
+  if (!validarLista(CAMPOS_CLIENTE)) return erroForm('Corrija os campos destacados em vermelho.');
   if (!itens.length) return erroForm('Adicione ao menos um item ao pedido.');
   if (editId) {
     const p = pedidos.find(x => x.id === editId);
@@ -196,7 +201,8 @@ function acaoPedido(id, acao) {
   if (acao === 'alterar') {
     editId = id; itens = clone(p.itens);
     $('vNome').value = p.vendedor.nome; $('vCargo').value = p.vendedor.cargo;
-    $('cNome').value = p.cliente.nome; $('cNumero').value = p.cliente.numero; $('cDoc').value = p.cliente.documento;
+    $('cNome').value = p.cliente.nome; $('cNumero').value = mascaraTelefone(p.cliente.numero); $('cDoc').value = mascaraDocumento(p.cliente.documento);
+    limparErrosCampos($('aba-novo'));
     $('bannerTxt').innerText = 'Editando o pedido ' + n; $('bannerEdit').classList.remove('hidden');
     $('tabNovoTxt').innerText = 'Editar Pedido'; $('btnSalvar').innerText = 'Salvar alterações';
     renderItens(); mostrarAba('novo'); return;
@@ -295,7 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
   $('listaClientes').innerHTML = ler('oficina_usuarios', []).map(u => `<option value="${esc(u.nome)}">`).join('');
   if (ler('oficina_sidebar_oculta', false) && window.innerWidth >= 1024) { $('sidebar').classList.add('collapsed'); $('setaSidebar').className = 'fa-solid fa-angles-right'; }
   aplicarMascara('cDoc', 'documento'); aplicarMascara('cNumero', 'telefone');
+  ligarValidacaoCampos(CAMPOS_CLIENTE);
   preencherVendedor(); renderItens();
   const h = location.hash.slice(1);
   mostrarAba(ABAS.includes(h) ? h : 'novo');
-});
+}); 
