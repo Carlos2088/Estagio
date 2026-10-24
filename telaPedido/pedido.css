@@ -6,35 +6,4 @@
 .lbl{display:block;font-size:.875rem;color:#cbd5e1;margin-bottom:.35rem}
 .tab{padding:.55rem 1.1rem;border-radius:.75rem;font-weight:600;font-size:.875rem;color:#cbd5e1;background:#1C2541;transition:.2s}
 .tab.on{background:#E06666;color:#fff}
-.bt{padding:.4rem .75rem;border-radius:.5rem;font-size:.75rem;font-weight:600;transition:.2s}/* Estilos da tela de Pedidos e Vendas */
-#sidebar{transition:margin-left .3s,transform .3s}
-@media(min-width:1024px){#sidebar.collapsed{margin-left:-16rem}}
-.inp{width:100%;background:#0B132B;border:1px solid rgba(51,65,85,.8);border-radius:.75rem;padding:.7rem;color:#f1f5f9;outline:none}
-.inp:focus{border-color:#E06666;box-shadow:0 0 0 1px #E06666}
-.lbl{display:block;font-size:.875rem;color:#cbd5e1;margin-bottom:.35rem}
-.tab{padding:.55rem 1.1rem;border-radius:.75rem;font-weight:600;font-size:.875rem;color:#cbd5e1;background:#1C2541;transition:.2s}
-.tab.on{background:#E06666;color:#fff}
 .bt{padding:.4rem .75rem;border-radius:.5rem;font-size:.75rem;font-weight:600;transition:.2s}
-
-/* ===== Melhorias visuais (PDV) ===== */
-.card-resumo{display:flex;align-items:center;gap:.9rem;background:#1C2541;border:1px solid #1e293b;border-radius:1rem;padding:.9rem 1.1rem;transition:.2s;width:100%}
-button.card-resumo:hover{border-color:#E06666;transform:translateY(-1px)}
-.card-resumo .ico{width:2.6rem;height:2.6rem;border-radius:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.item-linha{display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:.9rem;background:#0B132B;border:1px solid #1e293b}
-.item-alerta{border-color:rgba(245,158,11,.55)}
-.stepper{display:flex;align-items:center;background:#1C2541;border:1px solid #334155;border-radius:.6rem;overflow:hidden}
-.stepper button{width:1.9rem;height:1.9rem;color:#cbd5e1;transition:.15s}
-.stepper button:hover{background:#E06666;color:#fff}
-.stepper input{width:2.6rem;text-align:center;background:transparent;color:#f1f5f9;outline:none;-moz-appearance:textfield}
-.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.resumo-box{background:linear-gradient(135deg,rgba(224,102,102,.2),rgba(224,102,102,.04));border:1px solid rgba(224,102,102,.35);border-radius:1rem;padding:1rem 1.25rem}
-.pedido-card{background:#1C2541;border:1px solid #1e293b;border-left-width:4px;border-radius:1rem;padding:1.25rem;transition:.2s}
-.pedido-card:hover{box-shadow:0 12px 30px -14px rgba(0,0,0,.7)}
-.passos{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.7rem;color:#64748b}
-.passo{display:flex;align-items:center;gap:.35rem}
-.passo i{width:.6rem;height:.6rem;border-radius:9999px;background:#334155;display:inline-block}
-.passo.on{color:#e2e8f0}.passo.on i{background:#10b981}.passo.pend i{background:#f59e0b}
-.passo-linha{width:1.5rem;height:2px;background:#334155}
-.badge{margin-left:.5rem;background:rgba(255,255,255,.18);padding:0 .45rem;border-radius:9999px;font-size:.7rem}
-.vazio{text-align:center;color:#64748b;padding:2.5rem 1rem}
-.vazio i{font-size:2rem;margin-bottom:.6rem;display:block;opacity:.6}

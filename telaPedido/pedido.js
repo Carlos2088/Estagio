@@ -88,6 +88,7 @@ function preencherVendedor() {
   else { $('vNome').value = login; $('vCargo').value = ''; }
 }
 function preencherCliente() {
+  carregarMotos();
   const nome = $('cNome').value.trim().toLowerCase();
   const u = ler('oficina_usuarios', []).find(x => (x.nome || '').toLowerCase() === nome);
   if (u) { if (!$('cNumero').value) $('cNumero').value = mascaraTelefone(u.telefone); if (!$('cDoc').value) $('cDoc').value = mascaraDocumento(u.documento); }
@@ -95,6 +96,7 @@ function preencherCliente() {
 function limparForm() {
   editId = null; itens = [];
   ['cNome','cNumero','cDoc','busca'].forEach(i => $(i).value = '');
+  carregarMotos();
   $('bannerEdit').classList.add('hidden'); $('formErro').classList.add('hidden'); limparErrosCampos($('aba-novo'));
   $('tabNovoTxt').innerText = 'Novo Pedido'; $('btnSalvar').innerText = 'Salvar';
   preencherVendedor(); renderItens();
@@ -159,6 +161,19 @@ function renderItens() {
     <p class="text-2xl font-bold text-slate-100">${t > 0 ? money(t) : '-'}</p></div>`;
 }
 
+function carregarMotos(sel) {
+  const nome = semAcento($('cNome').value).trim().toLowerCase();
+  const motos = ler('oficina_motos', []).filter(m => semAcento(m.dono).trim().toLowerCase() === nome);
+  $('cMoto').innerHTML = '<option value="">Sem moto (venda balcão)</option>' +
+    motos.map(m => `<option value="${esc(m.id)}">${esc(m.placa)} — ${esc(m.marca)} ${esc(m.modelo)}</option>`).join('');
+  if (sel) $('cMoto').value = sel;
+}
+function motoSelecionada() {
+  const id = $('cMoto').value;
+  const m = id ? ler('oficina_motos', []).find(x => x.id === id) : null;
+  return m ? { id: m.id, placa: m.placa, marca: m.marca, modelo: m.modelo } : null;
+}
+
 function salvarPedido() {
   const v = {nome:$('vNome').value.trim(), cargo:$('vCargo').value.trim()};
   const c = {nome:$('cNome').value.trim(), numero:$('cNumero').value.trim(), documento:$('cDoc').value.trim()};
@@ -167,11 +182,11 @@ function salvarPedido() {
   if (!itens.length) return erroForm('Adicione ao menos um item ao pedido.');
   if (editId) {
     const p = pedidos.find(x => x.id === editId);
-    Object.assign(p, {vendedor:v, cliente:c, itens:clone(itens)});
+    Object.assign(p, {vendedor:v, cliente:c, moto:motoSelecionada(), itens:clone(itens)});
     toast('Pedido #' + fmtNum(p.numero) + ' alterado.');
   } else {
     const numero = pedidos.reduce((m, p) => Math.max(m, p.numero), 0) + 1;
-    pedidos.push({id:String(Date.now()), numero, data:new Date().toISOString(), vendedor:v, cliente:c, itens:clone(itens), status:'Em Análise'});
+    pedidos.push({id:String(Date.now()), numero, data:new Date().toISOString(), vendedor:v, cliente:c, moto:motoSelecionada(), itens:clone(itens), status:'Em Análise'});
     toast('Pedido #' + fmtNum(numero) + ' registrado para análise.');
   }
   gravar('oficina_pedidos', pedidos);
@@ -215,7 +230,7 @@ function renderPedidos() {
       </div>
       ${progresso(p)}
       <div class="text-sm text-slate-300 grid sm:grid-cols-2 gap-1">
-        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(p.cliente.nome)} ${p.cliente.documento ? '· ' + esc(p.cliente.documento) : ''}</p>
+        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(p.cliente.nome)} ${p.cliente.documento ? '· ' + esc(p.cliente.documento) : ''}${p.moto ? ' · <i class="fa-solid fa-motorcycle text-slate-500"></i> ' + esc(p.moto.placa) : ''}</p>
         <p><i class="fa-solid fa-id-badge text-slate-500 mr-2"></i>${esc(p.vendedor.nome)}${p.vendedor.cargo ? ' (' + esc(p.vendedor.cargo) + ')' : ''}</p>
       </div>
       <p class="text-xs text-slate-400">${p.itens.map(i => esc(i.descricao) + ' x' + i.qtd).join(' · ')}</p>
@@ -236,6 +251,7 @@ function acaoPedido(id, acao) {
     $('vNome').value = p.vendedor.nome; $('vCargo').value = p.vendedor.cargo;
     $('cNome').value = p.cliente.nome; $('cNumero').value = mascaraTelefone(p.cliente.numero); $('cDoc').value = mascaraDocumento(p.cliente.documento);
     limparErrosCampos($('aba-novo'));
+    carregarMotos(p.moto ? p.moto.id : '');
     $('bannerTxt').innerText = 'Editando o pedido ' + n; $('bannerEdit').classList.remove('hidden');
     $('tabNovoTxt').innerText = 'Editar Pedido'; $('btnSalvar').innerText = 'Salvar alterações';
     renderItens(); mostrarAba('novo'); return;
@@ -286,7 +302,7 @@ function realizarVenda(id) {
   linhas.forEach(l => { const pc = pecas.find(x => pid(x) === l.pecaId); const k = keyOf(pc, 'qtd'); pc[k] = num(pc[k]) - l.qtd; });
   gravar('oficina_pecas', pecas);
   const numero = vendas.reduce((m, v) => Math.max(m, v.numero), 0) + 1;
-  vendas.push({id:String(Date.now()), numero, pedidoId:p.id, pedidoNumero:p.numero, data:new Date().toISOString(), vendedor:p.vendedor, cliente:p.cliente, itens:clone(p.itens), total:totalDe(p.itens), status:'Concluída'});
+  vendas.push({id:String(Date.now()), numero, pedidoId:p.id, pedidoNumero:p.numero, data:new Date().toISOString(), vendedor:p.vendedor, cliente:p.cliente, moto:p.moto || null, itens:clone(p.itens), total:totalDe(p.itens), status:'Concluída'});
   p.status = 'Faturado';
   gravar('oficina_vendas', vendas); gravar('oficina_pedidos', pedidos);
   toast('Venda #' + fmtNum(numero) + ' registrada e estoque atualizado.');
@@ -307,7 +323,7 @@ function renderVendas() {
         <span class="text-xs px-3 py-1 rounded-full ${STATUS_VEN[v.status]}">${esc(v.status)}</span>
       </div>
       <div class="text-sm text-slate-300 grid sm:grid-cols-2 gap-1">
-        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(v.cliente.nome)}</p>
+        <p><i class="fa-solid fa-user text-slate-500 mr-2"></i>${esc(v.cliente.nome)}${v.moto ? ' · <i class="fa-solid fa-motorcycle text-slate-500"></i> ' + esc(v.moto.placa) : ''}</p>
         <p><i class="fa-solid fa-id-badge text-slate-500 mr-2"></i>${esc(v.vendedor.nome)}</p>
       </div>
       <p class="text-xs text-slate-400">${v.itens.map(i => esc(i.descricao) + ' x' + i.qtd).join(' · ')}</p>
@@ -340,6 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (ler('oficina_sidebar_oculta', false) && window.innerWidth >= 1024) { $('sidebar').classList.add('collapsed'); $('setaSidebar').className = 'fa-solid fa-angles-right'; }
   aplicarMascara('cDoc', 'documento'); aplicarMascara('cNumero', 'telefone');
   ligarValidacaoCampos(CAMPOS_CLIENTE);
+  carregarMotos();
+  $('cNome').addEventListener('input', () => carregarMotos($('cMoto').value));
   $('busca').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const b = document.querySelector('#resultados button'); if (b) b.click(); } });
   atualizarContadores();
   preencherVendedor(); renderItens();
