@@ -17,7 +17,7 @@ button.card-resumo:hover{border-color:#E06666;transform:translateY(-1px)}
 .stepper{display:flex;align-items:center;background:#1C2541;border:1px solid #334155;border-radius:.6rem;overflow:hidden}
 .stepper button{width:1.9rem;height:1.9rem;color:#cbd5e1;transition:.15s}
 .stepper button:hover{background:#E06666;color:#fff}
-.stepper input{width:2.6rem;text-align:center;background:transparent;color:#f1f5f9;outline:none;-moz-appearance:textfield}
+.stepper input {width: 2.6rem;text-align: center;background: transparent;color: #f1f5f9;outline: none;}
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .resumo-box{background:linear-gradient(135deg,rgba(224,102,102,.2),rgba(224,102,102,.04));border:1px solid rgba(224,102,102,.35);border-radius:1rem;padding:1rem 1.25rem}
 .pedido-card{background:#1C2541;border:1px solid #1e293b;border-left-width:4px;border-radius:1rem;padding:1.25rem;transition:.2s}
