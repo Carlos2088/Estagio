@@ -3,9 +3,9 @@ function getDados() {
     return pecas.map(p => ({
         nome: p.codigoInterno,
         descricao: p.descricao,
-        quantidade: 15,
-        preco: 120.00,
-        status: 'Normal'
+        quantidade: Number(p.quantidade) || 0,
+        preco: Number(p.precoVenda) || 0,
+        status: (Number(p.quantidade) || 0) === 0 ? 'Sem estoque' : (Number(p.quantidade) <= 5 ? 'Baixo' : 'Normal')
     }));
 }
 

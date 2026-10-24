@@ -20,7 +20,9 @@ function salvarPeca(e) {
         descricao: document.getElementById('descricao').value.trim(),
         aplicacao: document.getElementById('aplicacao').value.trim(),
         unidadeMedida: document.getElementById('unidadeMedida').value,
-        localizacao: document.getElementById('localizacao').value.trim()
+        localizacao: document.getElementById('localizacao').value.trim(),
+        quantidade: parseInt(document.getElementById('quantidade').value, 10) || 0,
+        precoVenda: parseFloat(document.getElementById('precoVenda').value) || 0
     };
 
     let pecas = getPecas();
@@ -88,6 +90,8 @@ function editarPeca(id) {
     document.getElementById('aplicacao').value = p.aplicacao;
     document.getElementById('unidadeMedida').value = p.unidadeMedida;
     document.getElementById('localizacao').value = p.localizacao;
+    document.getElementById('quantidade').value = p.quantidade || 0;
+    document.getElementById('precoVenda').value = p.precoVenda || '';
     closeModal();
     showToast('Peça carregada para edição.');
 }
