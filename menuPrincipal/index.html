@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,72 +9,121 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        #sidebar { transition: margin-left .3s, transform .3s; }
-        @media (min-width: 1024px) { #sidebar.collapsed { margin-left: -16rem; } }
+        #sidebar {
+            transition: margin-left .3s, transform .3s;
+        }
+
+        @media (min-width: 1024px) {
+            #sidebar.collapsed {
+                margin-left: -16rem;
+            }
+        }
     </style>
 </head>
+
 <body class="bg-slate-950 text-slate-100 font-sans flex h-screen overflow-hidden">
 
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
 
     <!-- BARRA LATERAL -->
-    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shadow-xl -translate-x-full lg:translate-x-0">
+    <aside id="sidebar"
+        class="fixed lg:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shadow-xl -translate-x-full lg:translate-x-0">
         <div class="overflow-y-auto">
             <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
                 <i class="fa-solid fa-motorcycle text-[#e06666] text-2xl"></i>
                 <h1 class="text-lg font-bold tracking-wide text-slate-100">Menu Principal</h1>
             </div>
             <nav class="p-4 space-y-2">
-                <a href="menu.html" class="nav-link flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 transition">
+                <a href="menu.html"
+                    class="nav-link flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 transition">
                     <i class="fa-solid fa-house text-[#e06666]"></i><span>Dashboard</span>
                 </a>
-
                 <div class="space-y-1">
-                    <button type="button" aria-expanded="false" onclick="toggleMenu('cadastrosSubmenu','cadastrosSubmenuIcon',this)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
-                        <span class="flex items-center space-x-3"><i class="fa-solid fa-user-gear text-[#e06666]"></i><span>Cadastros</span></span>
-                        <i id="cadastrosSubmenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    <button type="button" aria-expanded="false"
+                        onclick="toggleMenu('pedidosSubmenu','pedidosSubmenuIcon',this)"
+                        class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+                        <span class="flex items-center space-x-3"><i
+                                class="fa-solid fa-file-invoice-dollar text-[#e06666]"></i><span>Pedidos</span></span>
+                        <i id="pedidosSubmenuIcon"
+                            class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                     </button>
-                    <div id="cadastrosSubmenu" class="hidden pl-4 space-y-1 pt-1">
-                        <a href="../Cadastro/cadastroUsuario/cadastroUsuario.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Cliente</a>
-                        <a href="../Cadastro/cadastroPeca/cadastroPeca.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peça</a>
-                        <a href="../Cadastro/cadastroMoto/cadastroMoto.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Moto</a>
+                    <div id="pedidosSubmenu" class="hidden pl-4 space-y-1 pt-1">
+                        <a href="../telaPedido/telaPedido.html#novo"
+                            class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Novo
+                            Pedido</a>
+                        <a href="../telaPedido/telaPedido.html#pedidos"
+                            class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Pedidos</a>
+                        <a href="../telaPedido/telaPedido.html#vendas"
+                            class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Vendas</a>
                     </div>
                 </div>
 
                 <div class="space-y-1">
-                    <button type="button" aria-expanded="false" onclick="toggleMenu('consultasSubmenu','consultasSubmenuIcon',this)" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
-                        <span class="flex items-center space-x-3"><i class="fa-solid fa-magnifying-glass text-[#e06666]"></i><span>Consultas</span></span>
-                        <i id="consultasSubmenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    <button type="button" aria-expanded="false"
+                        onclick="toggleMenu('cadastrosSubmenu','cadastrosSubmenuIcon',this)"
+                        class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+                        <span class="flex items-center space-x-3"><i
+                                class="fa-solid fa-user-gear text-[#e06666]"></i><span>Cadastros</span></span>
+                        <i id="cadastrosSubmenuIcon"
+                            class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    </button>
+                    <div id="cadastrosSubmenu" class="hidden pl-4 space-y-1 pt-1">
+                        <a href="../Cadastro/cadastroUsuario/cadastroUsuario.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Cliente</a>
+                        <a href="../Cadastro/cadastroPeca/cadastroPeca.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peça</a>
+                        <a href="../Cadastro/cadastroMoto/cadastroMoto.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Moto</a>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <button type="button" aria-expanded="false"
+                        onclick="toggleMenu('consultasSubmenu','consultasSubmenuIcon',this)"
+                        class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+                        <span class="flex items-center space-x-3"><i
+                                class="fa-solid fa-magnifying-glass text-[#e06666]"></i><span>Consultas</span></span>
+                        <i id="consultasSubmenuIcon"
+                            class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                     </button>
                     <div id="consultasSubmenu" class="hidden pl-4 space-y-1 pt-1">
-    <a href="../Consulta/consultaPeca/index.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peças</a>
-    <a href="../Consulta/consultaUsuario/index.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Clientes</a>
-    <a href="../Consulta/ConsultaMoto/index.html" class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Motos</a>
-</div>
+                        <a href="../Consulta/consultaPeca/index.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peças</a>
+                        <a href="../Consulta/consultaUsuario/index.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Clientes</a>
+                        <a href="../Consulta/ConsultaMoto/index.html"
+                            class="nav-link block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Motos</a>
+                    </div>
                 </div>
             </nav>
         </div>
 
         <div>
             <div class="p-4 border-t border-slate-800">
-                <button type="button" onclick="sairDoSistema()" class="w-full flex items-center space-x-3 p-3 rounded-xl text-slate-300 hover:bg-red-500/15 hover:text-red-300 transition">
+                <button type="button" onclick="sairDoSistema()"
+                    class="w-full flex items-center space-x-3 p-3 rounded-xl text-slate-300 hover:bg-red-500/15 hover:text-red-300 transition">
                     <i class="fa-solid fa-right-from-bracket text-[#e06666]"></i><span>Sair</span>
                 </button>
             </div>
-            <div class="p-3 border-t border-slate-800 text-xs text-slate-500 text-center">Sistema de Gestão de Oficina v1.0</div>
+            <div class="p-3 border-t border-slate-800 text-xs text-slate-500 text-center">Sistema de Gestão de Oficina
+                v1.0</div>
         </div>
     </aside>
 
     <!-- CONTEÚDO -->
     <main class="flex-1 flex flex-col overflow-y-auto bg-slate-900/40 min-w-0">
-        <header class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 sm:px-8 shadow-sm shrink-0">
+        <header
+            class="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 sm:px-8 shadow-sm shrink-0">
             <div class="flex items-center space-x-3">
-                <button type="button" onclick="toggleSidebar()" class="w-9 h-9 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition" aria-label="Mostrar/ocultar menu" title="Mostrar/ocultar menu">
+                <button type="button" onclick="toggleSidebar()"
+                    class="w-9 h-9 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
+                    aria-label="Mostrar/ocultar menu" title="Mostrar/ocultar menu">
                     <i id="sidebarToggleIcon" class="fa-solid fa-angles-left"></i>
                 </button>
                 <h2 class="text-xl font-semibold text-slate-200">Dashboard Geral</h2>
             </div>
-            <span class="text-sm text-slate-400 hidden sm:inline"><i class="fa-regular fa-calendar-days mr-2"></i><span id="currentDate"></span></span>
+            <span class="text-sm text-slate-400 hidden sm:inline"><i class="fa-regular fa-calendar-days mr-2"></i><span
+                    id="currentDate"></span></span>
         </header>
 
         <div class="p-4 sm:p-8 space-y-6 max-w-7xl mx-auto w-full">
@@ -85,19 +135,31 @@
                         <i class="fa-solid fa-calendar text-[#e06666]"></i><span>Calendário de Serviços</span>
                     </h3>
                     <div class="flex items-center space-x-2">
-                        <button type="button" onclick="mudarMes(-1)" class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 transition" aria-label="Mês anterior"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                        <span id="monthLabel" class="text-xs bg-[#e06666]/20 text-[#e06666] px-3 py-1 rounded-full font-medium min-w-[120px] text-center"></span>
-                        <button type="button" onclick="mudarMes(1)" class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 transition" aria-label="Próximo mês"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        <button type="button" onclick="mudarMes(-1)"
+                            class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 transition"
+                            aria-label="Mês anterior"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <span id="monthLabel"
+                            class="text-xs bg-[#e06666]/20 text-[#e06666] px-3 py-1 rounded-full font-medium min-w-[120px] text-center"></span>
+                        <button type="button" onclick="mudarMes(1)"
+                            class="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-300 transition"
+                            aria-label="Próximo mês"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
                 <div class="grid grid-cols-7 gap-2 text-center text-xs text-slate-400 mb-2 font-semibold">
-                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                    <div>Dom</div>
+                    <div>Seg</div>
+                    <div>Ter</div>
+                    <div>Qua</div>
+                    <div>Qui</div>
+                    <div>Sex</div>
+                    <div>Sáb</div>
                 </div>
                 <div id="calendarGrid" class="grid grid-cols-7 gap-2 text-sm text-center"></div>
 
                 <!-- Marcação do dia selecionado -->
                 <div class="mt-5 pt-4 border-t border-slate-800">
-                    <p class="text-xs text-slate-400 mb-2">Marcar <span id="diaSelecionadoLabel" class="text-slate-200 font-semibold"></span> como:</p>
+                    <p class="text-xs text-slate-400 mb-2">Marcar <span id="diaSelecionadoLabel"
+                            class="text-slate-200 font-semibold"></span> como:</p>
                     <div id="paletaCores" class="flex flex-wrap gap-2"></div>
                 </div>
             </section>
@@ -106,9 +168,12 @@
             <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-medium text-slate-200 flex items-center space-x-2">
-                        <i class="fa-solid fa-clock text-[#e06666]"></i><span id="tituloAgendamentos">Agendamentos do Dia</span>
+                        <i class="fa-solid fa-clock text-[#e06666]"></i><span id="tituloAgendamentos">Agendamentos do
+                            Dia</span>
                     </h3>
-                    <button type="button" onclick="abrirModal()" class="w-9 h-9 rounded-full bg-[#e06666] hover:bg-[#d05555] text-white shadow-md transition" aria-label="Adicionar agendamento" title="Adicionar agendamento">
+                    <button type="button" onclick="abrirModal()"
+                        class="w-9 h-9 rounded-full bg-[#e06666] hover:bg-[#d05555] text-white shadow-md transition"
+                        aria-label="Adicionar agendamento" title="Adicionar agendamento">
                         <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
@@ -143,31 +208,39 @@
         <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-slate-100">Novo Agendamento</h3>
-                <button type="button" onclick="fecharModal()" class="text-slate-400 hover:text-white" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="fecharModal()" class="text-slate-400 hover:text-white"
+                    aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-slate-400 mb-4">Data: <span id="modalData" class="text-slate-200 font-semibold"></span></p>
+            <p class="text-xs text-slate-400 mb-4">Data: <span id="modalData"
+                    class="text-slate-200 font-semibold"></span></p>
             <div class="space-y-3">
                 <div>
                     <label class="text-xs text-slate-400">Horário</label>
-                    <input id="agHora" type="time" class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
+                    <input id="agHora" type="time"
+                        class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Serviço / Moto</label>
-                    <input id="agServico" type="text" placeholder="Ex.: Revisão Geral - Honda CB 500X" class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
+                    <input id="agServico" type="text" placeholder="Ex.: Revisão Geral - Honda CB 500X"
+                        class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
                 </div>
                 <div>
                     <label class="text-xs text-slate-400">Cliente</label>
-                    <input id="agCliente" type="text" placeholder="Nome do cliente" class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
+                    <input id="agCliente" type="text" placeholder="Nome do cliente"
+                        class="w-full mt-1 p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-100 focus:outline-none focus:border-[#e06666]">
                 </div>
                 <p id="agErro" class="text-xs text-red-400 hidden">Preencha horário e serviço.</p>
             </div>
             <div class="flex justify-end space-x-2 mt-6">
-                <button type="button" onclick="fecharModal()" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition">Cancelar</button>
-                <button type="button" onclick="salvarAgendamento()" class="px-4 py-2 rounded-lg bg-[#e06666] hover:bg-[#d05555] text-white font-semibold transition">Salvar</button>
+                <button type="button" onclick="fecharModal()"
+                    class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 transition">Cancelar</button>
+                <button type="button" onclick="salvarAgendamento()"
+                    class="px-4 py-2 rounded-lg bg-[#e06666] hover:bg-[#d05555] text-white font-semibold transition">Salvar</button>
             </div>
         </div>
     </div>
 
     <script src="scriptMP.js"></script>
 </body>
+
 </html>

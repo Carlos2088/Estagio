@@ -1,0 +1,9 @@
+/* Estilos da tela de Pedidos e Vendas */
+#sidebar{transition:margin-left .3s,transform .3s}
+@media(min-width:1024px){#sidebar.collapsed{margin-left:-16rem}}
+.inp{width:100%;background:#0B132B;border:1px solid rgba(51,65,85,.8);border-radius:.75rem;padding:.7rem;color:#f1f5f9;outline:none}
+.inp:focus{border-color:#E06666;box-shadow:0 0 0 1px #E06666}
+.lbl{display:block;font-size:.875rem;color:#cbd5e1;margin-bottom:.35rem}
+.tab{padding:.55rem 1.1rem;border-radius:.75rem;font-weight:600;font-size:.875rem;color:#cbd5e1;background:#1C2541;transition:.2s}
+.tab.on{background:#E06666;color:#fff}
+.bt{padding:.4rem .75rem;border-radius:.5rem;font-size:.75rem;font-weight:600;transition:.2s}

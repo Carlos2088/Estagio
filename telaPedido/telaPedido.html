@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos e Vendas - MOTORPOINT</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="pedido.css">
+</head>
+<body class="bg-[#0B132B] text-slate-100 font-sans flex h-screen overflow-hidden">
+
+<div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden"></div>
+
+<aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shadow-xl -translate-x-full lg:translate-x-0">
+  <div class="overflow-y-auto">
+    <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+      <i class="fa-solid fa-motorcycle text-[#e06666] text-2xl"></i>
+      <h1 class="text-lg font-bold tracking-wide">Menu Principal</h1>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a href="../menuPrincipal/index.html" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-slate-800/60 text-slate-300 transition"><i class="fa-solid fa-house text-[#e06666]"></i><span>Dashboard</span></a>
+
+      <div class="space-y-1">
+        <button type="button" onclick="toggleMenu('pedSub','pedIcon')" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+          <span class="flex items-center space-x-3"><i class="fa-solid fa-file-invoice-dollar text-[#e06666]"></i><span>Pedidos</span></span>
+          <i id="pedIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300 rotate-180"></i>
+        </button>
+        <div id="pedSub" class="pl-4 space-y-1 pt-1">
+          <a href="#novo" data-link-aba="novo" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Novo Pedido</a>
+          <a href="#pedidos" data-link-aba="pedidos" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Pedidos</a>
+          <a href="#vendas" data-link-aba="vendas" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Vendas</a>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <button type="button" onclick="toggleMenu('cadSub','cadIcon')" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+          <span class="flex items-center space-x-3"><i class="fa-solid fa-user-gear text-[#e06666]"></i><span>Cadastros</span></span>
+          <i id="cadIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+        </button>
+        <div id="cadSub" class="hidden pl-4 space-y-1 pt-1">
+          <a href="../Cadastro/cadastroUsuario/cadastroUsuario.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Cliente</a>
+          <a href="../Cadastro/cadastroPeca/cadastroPeca.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peça</a>
+          <a href="../Cadastro/cadastroMoto/cadastroMoto.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Moto</a>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <button type="button" onclick="toggleMenu('conSub','conIcon')" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 text-slate-200 transition">
+          <span class="flex items-center space-x-3"><i class="fa-solid fa-magnifying-glass text-[#e06666]"></i><span>Consultas</span></span>
+          <i id="conIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+        </button>
+        <div id="conSub" class="hidden pl-4 space-y-1 pt-1">
+          <a href="../Consulta/consultaPeca/index.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Peças</a>
+          <a href="../Consulta/consultaUsuario/index.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Clientes</a>
+          <a href="../Consulta/ConsultaMoto/index.html" class="block p-2 rounded-lg text-sm bg-[#e06666]/15 text-white font-semibold hover:bg-[#e06666]/25 transition">Motos</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <div>
+    <div class="p-4 border-t border-slate-800">
+      <button type="button" onclick="sair()" class="w-full flex items-center space-x-3 p-3 rounded-xl text-slate-300 hover:bg-red-500/15 hover:text-red-300 transition"><i class="fa-solid fa-right-from-bracket text-[#e06666]"></i><span>Sair</span></button>
+    </div>
+    <div class="p-3 border-t border-slate-800 text-xs text-slate-500 text-center">Sistema de Gestão de Oficina v1.0</div>
+  </div>
+</aside>
+
+<main class="flex-1 flex flex-col overflow-y-auto min-w-0">
+  <header class="bg-[#1C2541] border-b border-slate-800/80 px-4 sm:px-8 py-4 flex items-center space-x-3 shadow-lg shrink-0">
+    <button type="button" onclick="toggleSidebar()" class="w-9 h-9 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition" title="Mostrar/ocultar menu"><i id="setaSidebar" class="fa-solid fa-angles-left"></i></button>
+    <h2 class="text-xl font-bold tracking-wide">Pedidos e Vendas</h2>
+  </header>
+
+  <div class="p-4 sm:p-8 max-w-6xl mx-auto w-full space-y-6">
+    <div class="flex flex-wrap gap-2">
+      <button class="tab on" data-aba="novo" onclick="mostrarAba('novo')"><i class="fa-solid fa-plus mr-2"></i><span id="tabNovoTxt">Novo Pedido</span></button>
+      <button class="tab" data-aba="pedidos" onclick="mostrarAba('pedidos')"><i class="fa-solid fa-clipboard-list mr-2"></i>Pedidos</button>
+      <button class="tab" data-aba="vendas" onclick="mostrarAba('vendas')"><i class="fa-solid fa-receipt mr-2"></i>Vendas</button>
+    </div>
+
+    <!-- NOVO PEDIDO -->
+    <section id="aba-novo">
+      <div id="bannerEdit" class="hidden mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm flex items-center justify-between">
+        <span id="bannerTxt"></span>
+        <button type="button" onclick="limparForm()" class="underline">Cancelar edição</button>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-[#1C2541] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+          <div class="bg-slate-800/70 px-6 py-3 font-bold text-sm tracking-wider text-center">VENDEDOR</div>
+          <div class="p-6 space-y-4">
+            <div><label class="lbl">Nome *</label><input id="vNome" class="inp" placeholder="Nome do vendedor"></div>
+            <div><label class="lbl">Cargo</label><input id="vCargo" class="inp" placeholder="Ex: Atendente"></div>
+          </div>
+        </div>
+
+        <div class="bg-[#1C2541] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+          <div class="bg-slate-800/70 px-6 py-3 font-bold text-sm tracking-wider text-center">CLIENTE</div>
+          <div class="p-6 space-y-4">
+            <div><label class="lbl">Nome *</label><input id="cNome" list="listaClientes" onchange="preencherCliente()" class="inp" placeholder="Nome do cliente"><datalist id="listaClientes"></datalist></div>
+            <div><label class="lbl">Número</label><input id="cNumero" class="inp" placeholder="(44) 99999-9999"></div>
+            <div><label class="lbl">CPF/CNPJ</label><input id="cDoc" class="inp" placeholder="000.000.000-00"></div>
+          </div>
+        </div>
+
+        <div class="bg-[#1C2541] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+          <div class="bg-slate-800/70 px-6 py-3 font-bold text-sm tracking-wider text-center">ITENS</div>
+          <div class="p-6 space-y-4 flex-1 flex flex-col">
+            <div class="relative">
+              <input id="busca" class="inp" placeholder="Pesquisar peça por código, descrição ou marca..." oninput="renderBusca()" onfocus="renderBusca()" autocomplete="off">
+              <div id="resultados" class="hidden absolute z-20 left-0 right-0 mt-1 bg-[#0B132B] border border-slate-700 rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
+            </div>
+            <div id="listaItens" class="space-y-2 flex-1 min-h-[8rem]"></div>
+            <div class="flex items-center justify-between text-sm"><span class="text-slate-400">Total</span><span id="totalForm" class="font-bold text-slate-100">-</span></div>
+            <p id="formErro" class="hidden text-xs text-red-400"></p>
+            <button type="button" onclick="salvarPedido()" class="w-full bg-[#E06666] hover:bg-[#c95252] text-white px-8 py-3 rounded-xl font-semibold transition shadow-lg shadow-[#E06666]/20" id="btnSalvar">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PEDIDOS -->
+    <section id="aba-pedidos" class="hidden space-y-4">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <h3 class="text-lg font-bold">Pedidos</h3>
+        <select id="filtroStatus" onchange="renderPedidos()" class="inp !w-auto">
+          <option value="">Todos os status</option><option>Em Análise</option><option>Pendente</option><option>Aprovado</option><option>Faturado</option><option>Cancelado</option>
+        </select>
+      </div>
+      <div id="listaPedidos" class="space-y-3"></div>
+    </section>
+
+    <!-- VENDAS -->
+    <section id="aba-vendas" class="hidden space-y-4">
+      <h3 class="text-lg font-bold">Vendas</h3>
+      <div id="listaVendas" class="space-y-3"></div>
+    </section>
+  </div>
+</main>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div id="cfModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md items-center justify-center p-4 z-50">
+  <div class="bg-[#1C2541] border border-slate-800 rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+      <h3 id="cfTitulo" class="text-lg font-bold"></h3>
+      <button onclick="fecharConfirm()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div id="cfCorpo" class="p-6 overflow-y-auto text-sm text-slate-300 space-y-3"></div>
+    <div class="p-6 border-t border-slate-800 flex justify-end space-x-3">
+      <button onclick="fecharConfirm()" class="bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 px-5 py-2.5 rounded-xl font-medium transition">Voltar</button>
+      <button id="cfOk" class="px-6 py-2.5 rounded-xl font-semibold text-white transition disabled:opacity-40 disabled:cursor-not-allowed"></button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3.5 rounded-xl shadow-2xl z-50 font-medium"></div>
+
+<script src="pedido.js"></script>
+</body>
+</html>
