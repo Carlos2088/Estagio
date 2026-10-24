@@ -100,6 +100,7 @@
             <div><label class="lbl">Nome *</label><input id="cNome" list="listaClientes" onchange="preencherCliente()" class="inp" placeholder="Nome do cliente"><datalist id="listaClientes"></datalist></div>
             <div><label class="lbl">Número</label><input id="cNumero" class="inp" placeholder="(44) 99999-9999"></div>
             <div><label class="lbl">CPF/CNPJ</label><input id="cDoc" class="inp" placeholder="000.000.000-00"></div>
+            <div><label class="lbl">Moto</label><select id="cMoto" class="inp"><option value="">Sem moto (venda balcão)</option></select></div>
           </div>
         </div>
 
@@ -157,7 +158,7 @@
 
 <div id="toast" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3.5 rounded-xl shadow-2xl z-50 font-medium"></div>
 
-<script src="../Validacoes/validacoesCu.js"></script>
+<script src="../validacoes/validacoes.js"></script>
 <script src="pedido.js"></script>
 </body>
 </html>
