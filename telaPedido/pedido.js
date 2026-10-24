@@ -138,6 +138,8 @@ function salvarPedido() {
   const v = {nome:$('vNome').value.trim(), cargo:$('vCargo').value.trim()};
   const c = {nome:$('cNome').value.trim(), numero:$('cNumero').value.trim(), documento:$('cDoc').value.trim()};
   if (!v.nome || !c.nome) return erroForm('Informe o nome do vendedor e do cliente.');
+  if (c.documento) { const r = validarDocumento(c.documento); if (!r.ok) return erroForm('CPF/CNPJ do cliente: ' + r.msg); }
+  if (c.numero) { const r = validarTelefone(c.numero); if (!r.ok) return erroForm('Telefone do cliente: ' + r.msg); }
   if (!itens.length) return erroForm('Adicione ao menos um item ao pedido.');
   if (editId) {
     const p = pedidos.find(x => x.id === editId);
@@ -292,6 +294,7 @@ function cancelarVenda(id) {
 document.addEventListener('DOMContentLoaded', () => {
   $('listaClientes').innerHTML = ler('oficina_usuarios', []).map(u => `<option value="${esc(u.nome)}">`).join('');
   if (ler('oficina_sidebar_oculta', false) && window.innerWidth >= 1024) { $('sidebar').classList.add('collapsed'); $('setaSidebar').className = 'fa-solid fa-angles-right'; }
+  aplicarMascara('cDoc', 'documento'); aplicarMascara('cNumero', 'telefone');
   preencherVendedor(); renderItens();
   const h = location.hash.slice(1);
   mostrarAba(ABAS.includes(h) ? h : 'novo');
