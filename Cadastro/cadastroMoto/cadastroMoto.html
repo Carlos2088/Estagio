@@ -26,7 +26,7 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-1 max-w-5xl mx-auto w-full p-6 md:p-10 flex items-center justify-center">
         <div class="bg-[#1C2541] border border-slate-800 rounded-3xl shadow-2xl p-8 w-full">
-            <form id="motoForm" onsubmit="salvarMoto(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form id="motoForm" novalidate onsubmit="salvarMoto(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="hidden" id="motoId">
                 
                 <div>
@@ -36,7 +36,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-1.5">Marca *</label>
-                    <input type="text" id="marcaMoto" required placeholder="Ex: Honda, Yamaha" class="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666] focus:ring-1 focus:ring-[#E06666] transition">
+                    <select id="marcaMoto" required class="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666] focus:ring-1 focus:ring-[#E06666] transition"><option value="">Selecione...</option></select>
                 </div>
 
                 <div>
@@ -56,7 +56,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-1.5">Ano de Fabricação *</label>
-                    <input type="number" id="ano" required min="1950" max="2027" placeholder="2024" class="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666] focus:ring-1 focus:ring-[#E06666] transition">
+                    <input type="number" id="ano" required min="1950" placeholder="2024" class="w-full bg-[#0B132B] border border-slate-700/80 rounded-xl p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-[#E06666] focus:ring-1 focus:ring-[#E06666] transition">
                 </div>
 
                 <div class="md:col-span-2">
@@ -102,6 +102,7 @@
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-3.5 rounded-xl shadow-2xl transition-all duration-300 z-50 font-medium"></div>
 
+    <script src="../../Validacoes/validacoesCu.js"></script>
     <script src="cdMoto.js"></script>
 </body>
 </html>

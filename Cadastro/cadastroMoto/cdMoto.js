@@ -1,6 +1,8 @@
-function showToast(msg) {
+function showToast(msg, erro) {
     const t = document.getElementById('toast');
     t.innerText = msg;
+    t.classList.toggle('bg-red-600', !!erro);
+    t.classList.toggle('bg-emerald-600', !erro);
     t.classList.remove('hidden');
     setTimeout(() => t.classList.add('hidden'), 3000);
 }
@@ -10,19 +12,18 @@ function saveMotos(motos) { localStorage.setItem('oficina_motos', JSON.stringify
 
 function salvarMoto(e) {
     e.preventDefault();
-    const id = document.getElementById('motoId').value;
-    const chassi = document.getElementById('chassi').value.trim();
-
-    if (chassi.length !== 17) {
-        alert('O chassi precisa ter exatamente 17 caracteres.');
+    if (!validarFormMoto()) {
+        showToast('Corrija os campos destacados em vermelho.', true);
         return;
     }
+    const id = document.getElementById('motoId').value;
+    const chassi = document.getElementById('chassi').value.trim().toUpperCase();
 
     const nova = {
         id: id ? id : Date.now().toString(),
         dono: document.getElementById('dono').value.trim(),
         marca: document.getElementById('marcaMoto').value.trim(),
-        placa: document.getElementById('placa').value.trim(),
+        placa: document.getElementById('placa').value.trim().toUpperCase(),
         cor: document.getElementById('cor').value.trim(),
         chassi: chassi,
         ano: document.getElementById('ano').value,
@@ -30,14 +31,22 @@ function salvarMoto(e) {
     };
 
     let motos = getMotos();
+    const outras = motos.filter(m => m.id !== nova.id);
+    const alfanum = s => String(s || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (outras.some(m => alfanum(m.placa) === alfanum(nova.placa))) {
+        mostrarErroCampo(document.getElementById('placa'), 'Já existe uma moto cadastrada com esta placa.');
+        showToast('Corrija os campos destacados em vermelho.', true);
+        return;
+    }
+    if (outras.some(m => String(m.chassi || '').toUpperCase() === nova.chassi)) {
+        mostrarErroCampo(document.getElementById('chassi'), 'Já existe uma moto cadastrada com este chassi.');
+        showToast('Corrija os campos destacados em vermelho.', true);
+        return;
+    }
     if (id) {
         motos = motos.map(m => m.id === id ? nova : m);
         showToast('Moto atualizada com sucesso!');
     } else {
-        if (motos.some(m => m.placa === nova.placa)) {
-            alert('Já existe uma moto cadastrada com esta placa!');
-            return;
-        }
         motos.push(nova);
         showToast('Moto cadastrada com sucesso!');
     }
@@ -47,6 +56,7 @@ function salvarMoto(e) {
 
 function resetForm() {
     document.getElementById('motoForm').reset();
+    limparErrosCampos(document.getElementById('motoForm'));
     document.getElementById('motoId').value = '';
 }
 
@@ -88,11 +98,12 @@ function editarMoto(id) {
     document.getElementById('motoId').value = m.id;
     document.getElementById('dono').value = m.dono;
     document.getElementById('marcaMoto').value = m.marca;
-    document.getElementById('placa').value = m.placa;
+    document.getElementById('placa').value = mascaraPlaca(m.placa);
     document.getElementById('cor').value = m.cor;
     document.getElementById('chassi').value = m.chassi;
     document.getElementById('ano').value = m.ano;
     document.getElementById('modelo').value = m.modelo;
+    limparErrosCampos(document.getElementById('motoForm'));
     closeModal();
     showToast('Moto carregada para edição.');
 }
@@ -105,3 +116,39 @@ function excluirMoto(id) {
         showToast('Moto excluída com sucesso!');
     }
 }
+
+/* ===== Validações do formulário ===== */
+function camposMoto() {
+    const $ = id => document.getElementById(id);
+    return [
+        ['dono', validarClienteCadastrado],
+        ['marcaMoto', validarMarcaMoto],
+        ['placa', validarPlaca],
+        ['cor', validarCor],
+        ['chassi', v => validarChassi(v, $('ano').value)],
+        ['ano', validarAnoFabricacao],
+        ['modelo', validarModelo]
+    ];
+}
+function validarFormMoto() { return validarLista(camposMoto()); }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const $ = id => document.getElementById(id);
+    $('marcaMoto').innerHTML = '<option value="">Selecione...</option>' + MARCAS_MOTO.map(m => `<option value="${m}">${m}</option>`).join('');
+    $('ano').max = new Date().getFullYear();
+
+    // sugestões de clientes já cadastrados no campo "Dono"
+    const dl = document.createElement('datalist');
+    dl.id = 'listaDonos';
+    document.body.appendChild(dl);
+    $('dono').setAttribute('list', 'listaDonos');
+    const atualizarDonos = () => { dl.innerHTML = nomesClientesCadastrados().map(n => `<option value="${n.replace(/"/g, '&quot;')}">`).join(''); };
+    atualizarDonos();
+    $('dono').addEventListener('focus', atualizarDonos);
+
+    aplicarMascaraFn('placa', mascaraPlaca);
+    aplicarMascaraFn('chassi', mascaraChassi);
+    ligarValidacaoCampos(camposMoto());
+    // ao mudar o ano, reconfere o chassi (o 10º caractere precisa combinar com o ano)
+    $('ano').addEventListener('change', () => { if ($('chassi').value.trim()) mostrarErroCampo($('chassi'), validarChassi($('chassi').value, $('ano').value).msg); });
+});
