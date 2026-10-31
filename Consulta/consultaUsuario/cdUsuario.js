@@ -1,13 +1,18 @@
 function getDados() {
-    const usuarios = JSON.parse(localStorage.getItem('oficina_usuarios') || '[]');
-    const motos = JSON.parse(localStorage.getItem('oficina_motos') || '[]');
+    const usuarios = (typeof Api !== 'undefined' && Api.cache && Api.cache.usuarios && Api.cache.usuarios.length)
+        ? Api.cache.usuarios
+        : JSON.parse(localStorage.getItem('oficina_usuarios') || '[]');
+    const motos = (typeof Api !== 'undefined' && Api.cache && Api.cache.motos && Api.cache.motos.length)
+        ? Api.cache.motos
+        : JSON.parse(localStorage.getItem('oficina_motos') || '[]');
     
     return usuarios.map(u => {
-        const motoDoCliente = motos.find(m => m.dono.toLowerCase() === u.nome.toLowerCase());
+        const uNome = (u.nome || '').toLowerCase();
+        const motoDoCliente = motos.find(m => (m.dono || '').toLowerCase() === uNome);
         return {
-            nome: u.nome,
+            nome: u.nome || '',
             numero: u.telefone || '(44) 99999-9999',
-            email: u.email,
+            email: u.email || '',
             placa: motoDoCliente ? motoDoCliente.placa : 'N/A',
             status: 'Ativo'
         };
@@ -18,8 +23,10 @@ let dadosAtuais = getDados();
 
 function renderTabela(lista) {
     const tbody = document.getElementById('tabelaClientes');
-    tbody.innerHTML = lista.length === 0 ? '<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhum registo encontrado.</td></tr>' : '';
-    
+    if (!tbody) return;
+    tbody.innerHTML = (!lista || lista.length === 0) ? '<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhum registro encontrado.</td></tr>' : '';
+    if (!lista) return;
+
     lista.forEach(item => {
         tbody.innerHTML += `
             <tr class="hover:bg-slate-800/40 transition">
@@ -33,12 +40,14 @@ function renderTabela(lista) {
 }
 
 function aplicarFiltros() {
-    const texto = document.getElementById('filtroTexto').value.toLowerCase();
+    const texto = (document.getElementById('filtroTexto').value || '').toLowerCase();
     const status = document.getElementById('filtroStatus').value;
     
     const todos = getDados();
     dadosAtuais = todos.filter(item => {
-        const matchTexto = item.nome.toLowerCase().includes(texto) || item.email.toLowerCase().includes(texto) || item.numero.includes(texto);
+        const matchTexto = item.nome.toLowerCase().includes(texto) ||
+                           item.email.toLowerCase().includes(texto) ||
+                           item.numero.includes(texto);
         const matchStatus = status === '' || item.status === status;
         return matchTexto && matchStatus;
     });
@@ -53,21 +62,18 @@ function limparFiltros() {
 }
 
 function gerarRelatorio() {
-    const janela = window.open('', '_blank');
-    janela.document.write(`
-        <html><head><title>Relatório de Clientes</title>
-        <style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #ddd;padding:10px;text-align:left;}th{background:#E06666;color:white;}</style>
-        </head><body>
-        <h2>Relatório de Clientes / Usuários - MOTORPOINT</h2>
-        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-        <table><thead><tr><th>NOME</th><th>NÚMERO</th><th>E-MAIL</th><th>PLACA</th><th>STATUS</th></tr></thead><tbody>
-        ${dadosAtuais.map(i => `<tr><td>${i.nome}</td><td>${i.numero}</td><td>${i.email}</td><td>${i.placa}</td><td>${i.status}</td></tr>`).join('')}
-        </tbody></table></body></html>
-    `);
-    janela.document.close();
-    janela.print();
+    window.print();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     renderTabela(dadosAtuais);
+    if (typeof Api !== 'undefined' && Api.carregar) {
+        try {
+            await Api.carregar('usuarios', 'motos');
+            dadosAtuais = getDados();
+            renderTabela(dadosAtuais);
+        } catch (e) {
+            console.warn('Servidor offline:', e);
+        }
+    }
 });

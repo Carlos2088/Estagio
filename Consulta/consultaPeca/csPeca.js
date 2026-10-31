@@ -1,8 +1,10 @@
 function getDados() {
-    const pecas = JSON.parse(localStorage.getItem('oficina_pecas') || '[]');
+    const pecas = (typeof Api !== 'undefined' && Api.cache && Api.cache.pecas && Api.cache.pecas.length)
+        ? Api.cache.pecas
+        : JSON.parse(localStorage.getItem('oficina_pecas') || '[]');
     return pecas.map(p => ({
-        nome: p.codigoInterno,
-        descricao: p.descricao,
+        nome: p.codigoInterno || '',
+        descricao: p.descricao || '',
         quantidade: Number(p.quantidade) || 0,
         preco: Number(p.precoVenda) || 0,
         status: (Number(p.quantidade) || 0) === 0 ? 'Sem estoque' : (Number(p.quantidade) <= 5 ? 'Baixo' : 'Normal')
@@ -13,8 +15,10 @@ let dadosAtuais = getDados();
 
 function renderTabela(lista) {
     const tbody = document.getElementById('tabelaPecas');
-    tbody.innerHTML = lista.length === 0 ? '<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhuma peça encontrada.</td></tr>' : '';
-    
+    if (!tbody) return;
+    tbody.innerHTML = (!lista || lista.length === 0) ? '<tr><td colspan="5" class="p-6 text-center text-slate-500">Nenhuma peça encontrada.</td></tr>' : '';
+    if (!lista) return;
+
     lista.forEach(item => {
         tbody.innerHTML += `
             <tr class="hover:bg-slate-800/40 transition">
@@ -28,7 +32,7 @@ function renderTabela(lista) {
 }
 
 function aplicarFiltros() {
-    const texto = document.getElementById('filtroTexto').value.toLowerCase();
+    const texto = (document.getElementById('filtroTexto').value || '').toLowerCase();
     const status = document.getElementById('filtroStatus').value;
     
     const todos = getDados();
@@ -48,21 +52,18 @@ function limparFiltros() {
 }
 
 function gerarRelatorio() {
-    const janela = window.open('', '_blank');
-    janela.document.write(`
-        <html><head><title>Relatório de Peças</title>
-        <style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #ddd;padding:10px;text-align:left;}th{background:#E06666;color:white;}</style>
-        </head><body>
-        <h2>Relatório de Peças e Estoque - MOTORPOINT</h2>
-        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-        <table><thead><tr><th>NOME / CÓDIGO</th><th>DESCRIÇÃO</th><th>QUANTIDADE</th><th>PREÇO (R$)</th><th>STATUS</th></tr></thead><tbody>
-        ${dadosAtuais.map(i => `<tr><td>${i.nome}</td><td>${i.descricao}</td><td>${i.quantidade}</td><td>R$ ${i.preco.toFixed(2)}</td><td>${i.status}</td></tr>`).join('')}
-        </tbody></table></body></html>
-    `);
-    janela.document.close();
-    janela.print();
+    window.print();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     renderTabela(dadosAtuais);
+    if (typeof Api !== 'undefined' && Api.carregar) {
+        try {
+            await Api.carregar('pecas');
+            dadosAtuais = getDados();
+            renderTabela(dadosAtuais);
+        } catch (e) {
+            console.warn('Servidor offline:', e);
+        }
+    }
 });

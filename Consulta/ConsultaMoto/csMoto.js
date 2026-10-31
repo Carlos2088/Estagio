@@ -1,11 +1,13 @@
 function getDados() {
-    const motos = JSON.parse(localStorage.getItem('oficina_motos') || '[]');
+    const motos = (typeof Api !== 'undefined' && Api.cache && Api.cache.motos && Api.cache.motos.length)
+        ? Api.cache.motos
+        : JSON.parse(localStorage.getItem('oficina_motos') || '[]');
     return motos.map(m => ({
-        placa: m.placa,
-        modelo: m.modelo,
-        marca: m.marca,
-        ano: m.ano,
-        proprietario: m.dono,
+        placa: m.placa || '',
+        modelo: m.modelo || '',
+        marca: m.marca || '',
+        ano: m.ano || '',
+        proprietario: m.dono || '',
         status: 'Disponível'
     }));
 }
@@ -14,8 +16,10 @@ let dadosAtuais = getDados();
 
 function renderTabela(lista) {
     const tbody = document.getElementById('tabelaMotos');
-    tbody.innerHTML = lista.length === 0 ? '<tr><td colspan="6" class="p-6 text-center text-slate-500">Nenhuma moto encontrada.</td></tr>' : '';
-    
+    if (!tbody) return;
+    tbody.innerHTML = (!lista || lista.length === 0) ? '<tr><td colspan="6" class="p-6 text-center text-slate-500">Nenhuma moto encontrada.</td></tr>' : '';
+    if (!lista) return;
+
     lista.forEach(item => {
         tbody.innerHTML += `
             <tr class="hover:bg-slate-800/40 transition">
@@ -30,12 +34,14 @@ function renderTabela(lista) {
 }
 
 function aplicarFiltros() {
-    const texto = document.getElementById('filtroTexto').value.toLowerCase();
+    const texto = (document.getElementById('filtroTexto').value || '').toLowerCase();
     const status = document.getElementById('filtroStatus').value;
     
     const todos = getDados();
     dadosAtuais = todos.filter(item => {
-        const matchTexto = item.placa.toLowerCase().includes(texto) || item.modelo.toLowerCase().includes(texto) || item.proprietario.toLowerCase().includes(texto);
+        const matchTexto = item.placa.toLowerCase().includes(texto) ||
+                           item.modelo.toLowerCase().includes(texto) ||
+                           item.proprietario.toLowerCase().includes(texto);
         const matchStatus = status === '' || item.status === status;
         return matchTexto && matchStatus;
     });
@@ -50,21 +56,18 @@ function limparFiltros() {
 }
 
 function gerarRelatorio() {
-    const janela = window.open('', '_blank');
-    janela.document.write(`
-        <html><head><title>Relatório de Motos</title>
-        <style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;margin-top:20px;}th,td{border:1px solid #ddd;padding:10px;text-align:left;}th{background:#E06666;color:white;}</style>
-        </head><body>
-        <h2>Relatório de Motos - MOTORPOINT</h2>
-        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-        <table><thead><tr><th>PLACA</th><th>MODELO</th><th>MARCA</th><th>ANO</th><th>PROPRIETÁRIO</th><th>STATUS</th></tr></thead><tbody>
-        ${dadosAtuais.map(i => `<tr><td>${i.placa}</td><td>${i.modelo}</td><td>${i.marca}</td><td>${i.ano}</td><td>${i.proprietario}</td><td>${i.status}</td></tr>`).join('')}
-        </tbody></table></body></html>
-    `);
-    janela.document.close();
-    janela.print();
+    window.print();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     renderTabela(dadosAtuais);
+    if (typeof Api !== 'undefined' && Api.carregar) {
+        try {
+            await Api.carregar('motos');
+            dadosAtuais = getDados();
+            renderTabela(dadosAtuais);
+        } catch (e) {
+            console.warn('Servidor offline:', e);
+        }
+    }
 });

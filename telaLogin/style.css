@@ -1,0 +1,4 @@
+body { font-family: 'Inter', sans-serif; }
+.bg-grid-pattern { background-image: radial-gradient(rgba(224, 102, 102, 0.12) 1px, transparent 1px); background-size: 24px 24px; }
+.glow-red { box-shadow: 0 0 35px -5px rgba(224, 102, 102, 0.25); }
+

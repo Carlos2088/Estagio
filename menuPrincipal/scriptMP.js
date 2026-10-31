@@ -1,11 +1,6 @@
 const LOGIN_URL = '../telaLogin/index.html';
 const SESSAO_KEY = 'motorpoint_user_session';
 
-// Protege a página: sem sessão, volta para o login
-//if (!localStorage.getItem(SESSAO_KEY)) {
-    //window.location.replace(LOGIN_URL);
-//}
-
 const CORES = {
     amarelo: { hex: '#eab308', texto: '#1e293b', nome: 'Atenção' },
     laranja: { hex: '#f97316', texto: '#ffffff', nome: 'Pendente' },
@@ -90,8 +85,11 @@ function destacarLinkAtual() {
     });
 }
 
-function sairDoSistema() {
+async function sairDoSistema() {
     if (!confirm('Deseja sair do sistema?')) return;
+    if (typeof Api !== 'undefined' && Api.logout) {
+        try { await Api.logout(); } catch (e) {}
+    }
     localStorage.removeItem(SESSAO_KEY);
     window.location.replace(LOGIN_URL);
 }
@@ -108,11 +106,14 @@ function selecionarDia(chave) {
     renderAgendamentos();
 }
 
-function definirCor(nomeCor) {
+async function definirCor(nomeCor) {
     if (nomeCor) coresDias[diaSelecionado] = nomeCor;
     else delete coresDias[diaSelecionado];
     gravar('oficina_cores_dias', coresDias);
     renderCalendario();
+    if (typeof Api !== 'undefined' && Api.salvarConfig) {
+        try { await Api.salvarConfig({ coresDias, agendamentos }); } catch (e) {}
+    }
 }
 
 function renderPaleta() {
@@ -209,21 +210,27 @@ function renderAgendamentos() {
         </div>`).join('');
 }
 
-function alternarStatus(id) {
+async function alternarStatus(id) {
     const ordem = Object.keys(STATUS);
     const ag = agendamentos.find(a => a.id === id);
     if (!ag) return;
     ag.status = ordem[(ordem.indexOf(ag.status) + 1) % ordem.length];
     gravar('oficina_agendamentos', agendamentos);
     renderAgendamentos();
+    if (typeof Api !== 'undefined' && Api.salvarConfig) {
+        try { await Api.salvarConfig({ agendamentos, coresDias }); } catch (e) {}
+    }
 }
 
-function removerAgendamento(id) {
+async function removerAgendamento(id) {
     if (!confirm('Excluir este agendamento?')) return;
     agendamentos = agendamentos.filter(a => a.id !== id);
     gravar('oficina_agendamentos', agendamentos);
     renderAgendamentos();
     renderCalendario();
+    if (typeof Api !== 'undefined' && Api.salvarConfig) {
+        try { await Api.salvarConfig({ agendamentos, coresDias }); } catch (e) {}
+    }
 }
 
 function abrirModal() {
@@ -242,7 +249,7 @@ function fecharModal() {
     m.classList.remove('flex');
 }
 
-function salvarAgendamento() {
+async function salvarAgendamento() {
     const hora = document.getElementById('agHora').value;
     const servico = document.getElementById('agServico').value.trim();
     const cliente = document.getElementById('agCliente').value.trim();
@@ -255,10 +262,23 @@ function salvarAgendamento() {
     fecharModal();
     renderAgendamentos();
     renderCalendario();
+    if (typeof Api !== 'undefined' && Api.salvarConfig) {
+        try { await Api.salvarConfig({ agendamentos, coresDias }); } catch (e) {}
+    }
+}
+
+function atualizarEstoque() {
+    const pecas = (typeof Api !== 'undefined' && Api.cache.pecas && Api.cache.pecas.length)
+        ? Api.cache.pecas
+        : ler('oficina_pecas', []);
+    const total = document.getElementById('totalPecas');
+    const hoje = document.getElementById('totalPecasCadastradas');
+    if (total) total.innerText = pecas.length;
+    if (hoje) hoje.innerText = pecas.length;
 }
 
 /* ================= Inicialização ================= */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const dataEl = document.getElementById('currentDate');
     if (dataEl) {
         dataEl.innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -269,19 +289,29 @@ document.addEventListener('DOMContentLoaded', () => {
         atualizarSetaSidebar(true);
     }
 
+    // Carregar dados atualizados do back-end
+    if (typeof Api !== 'undefined' && Api.carregar) {
+        try {
+            await Api.carregar('config', 'pecas');
+            if (Api.cache.config) {
+                coresDias = Api.cache.config.coresDias || {};
+                agendamentos = Api.cache.config.agendamentos || [];
+                gravar('oficina_cores_dias', coresDias);
+                gravar('oficina_agendamentos', agendamentos);
+            }
+        } catch (e) {
+            console.warn('Usando armazenamento local (servidor indisponível):', e);
+        }
+    }
+
     renderPaleta();
     renderCalendario();
     renderAgendamentos();
     destacarLinkAtual();
+    atualizarEstoque();
 
     document.getElementById('modalAgendamento').addEventListener('click', (e) => {
         if (e.target.id === 'modalAgendamento') fecharModal();
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharModal(); });
-
-    const pecas = ler('oficina_pecas', []);
-    const total = document.getElementById('totalPecas');
-    const hoje = document.getElementById('totalPecasCadastradas');
-    if (total) total.innerText = pecas.length;
-    if (hoje) hoje.innerText = pecas.length;
 });

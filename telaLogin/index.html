@@ -78,7 +78,7 @@
             </form>
 
             <div class="mt-6 pt-6 border-t border-slate-800 text-center">
-                <p class="text-xs text-slate-500">Acesso demonstrativo: <span class="text-slate-300 font-mono bg-slate-800 px-2 py-0.5 rounded">admin</span> / <span class="text-slate-300 font-mono bg-slate-800 px-2 py-0.5 rounded">123456</span></p>
+                <p class="text-xs text-slate-500">Acesso administrativo: credencial <span class="text-slate-300 font-mono bg-slate-800 px-2 py-0.5 rounded">admin</span> configurada no setup do back-end.</p>
             </div>
         </div>
     </main>
@@ -94,71 +94,8 @@
         </div>
     </footer>
 
-    <script>
-    const MENU_URL = '../menuPrincipal/index.html';
-    const SESSAO_KEY = 'motorpoint_user_session';
-
-    function lerLS(chave, padrao) {
-        try { return JSON.parse(localStorage.getItem(chave)) || padrao; } catch (e) { return padrao; }
-    }
-
-    function toggleSenhaVisibility() {
-        const input = document.getElementById('senha');
-        const icon = document.getElementById('eyeIcon');
-        const mostrar = input.type === 'password';
-        input.type = mostrar ? 'text' : 'password';
-        icon.className = mostrar ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
-    }
-
-    function realizarLogin(e) {
-        e.preventDefault();
-        const usuario = document.getElementById('usuario').value.trim();
-        const senha = document.getElementById('senha').value;
-        const lembrar = document.getElementById('lembrar').checked;
-        const erro = document.getElementById('loginError');
-        const btn = document.getElementById('btnSubmit');
-
-        erro.classList.add('hidden');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> <span>Autenticando...</span>';
-
-        setTimeout(() => {
-            const entrada = usuario.toLowerCase();
-            const cadastrados = lerLS('oficina_usuarios', []);
-            const valido = (usuario === 'admin' && senha === '123456') ||
-                cadastrados.some(u =>
-                    [u.email, u.nome, u.documento].some(c => c && String(c).toLowerCase() === entrada) &&
-                    u.senha === senha
-                );
-
-            if (valido) {
-                if (lembrar) localStorage.setItem('motorpoint_remembered_user', usuario);
-                else localStorage.removeItem('motorpoint_remembered_user');
-                localStorage.setItem(SESSAO_KEY, JSON.stringify({ usuario, loginTime: new Date().toISOString() }));
-                    window.location.href = MENU_URL;
-            } else {
-                document.getElementById('errorMessage').innerText = 'Usuário ou senha incorretos. Tente admin / 123456';
-                erro.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = '<span>Entrar no Sistema</span> <i class="fa-solid fa-arrow-right"></i>';
-            }
-        }, 800);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('loginForm').addEventListener('submit', realizarLogin);
-        document.getElementById('btnOlho').addEventListener('click', toggleSenhaVisibility);
-        document.getElementById('linkEsqueceu').addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Para redefinir sua senha, entre em contato com o suporte ou administrador do sistema MOTORPOINT.');
-        });
-
-        const salvo = localStorage.getItem('motorpoint_remembered_user');
-        if (salvo) {
-            document.getElementById('usuario').value = salvo;
-            document.getElementById('lembrar').checked = true;
-        }
-    });
-    </script>
+   <link rel="stylesheet" href="/telaLogin/style.css">
+    <script src="/FrontApi/Api.js"></script>
+    <script src="/telaLogin/scriptTL.js"></script>
 </body>
 </html>
